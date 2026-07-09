@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   title: "Ghost Mode — Execute in silence",
   description:
     "Ghost Mode is a ruthless execution engine. One goal. Three missions a day. No excuses. Proof required.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
