@@ -9,267 +9,105 @@ export default async function Home() {
   if (userId) redirect("/today");
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-void">
-      {/* ── Ambient Background Glows ── */}
+    <main className="relative min-h-screen overflow-hidden bg-[#05000a] text-white selection:bg-[#DE0EFF]/30">
+      
+      {/* ── Ambient Gradients ── */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/4 rounded-full"
+        className="pointer-events-none absolute left-1/2 top-[10%] h-[600px] w-[800px] -translate-x-1/2 rounded-[100%] blur-[120px]"
         style={{
-          background:
-            "radial-gradient(circle, rgba(4,186,99,0.12) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(4,186,99,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, rgba(4,186,99,0.1) 40%, transparent 70%)",
         }}
       />
 
-      {/* ── Floating Particles ── */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              background: i % 2 === 0
-                ? "rgba(4,186,99,0.4)"
-                : "rgba(139,92,246,0.4)",
-              animation: `float ${8 + Math.random() * 12}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* ── Top Navigation Bar ── */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-5 sm:px-10">
-        <GhostLogo size={40} withWordmark />
-        <div className="hidden items-center gap-6 sm:flex">
-          <a href="#about" className="text-sm text-slate transition-colors hover:text-bone">
-            About
-          </a>
-          <a href="#features" className="text-sm text-slate transition-colors hover:text-bone">
-            Features
-          </a>
+      {/* ── Header Navbar (Logo left, Auth panel right) ── */}
+      <header className="absolute left-0 right-0 top-0 z-50 flex items-center justify-between px-6 py-6 md:px-12 md:py-8">
+        <GhostLogo size={36} withWordmark />
+        
+        {/* On desktop, show the auth panel inline or a trigger. We'll show a compact login here or hide it if we have the side panel */}
+        <div className="hidden lg:flex items-center gap-6">
+           <span className="text-sm font-medium text-gray-400">No hype. No excuses. Only execution.</span>
         </div>
-      </nav>
+      </header>
 
       {/* ── Hero Section ── */}
-      <div className="relative z-10 mx-auto grid min-h-[calc(100vh-80px)] max-w-7xl grid-cols-1 items-center gap-8 px-6 py-8 lg:grid-cols-12 lg:gap-12 lg:px-10">
-
-        {/* Left Column: Hero Content */}
-        <section className="animate-fade-in lg:col-span-7">
-          {/* Greeting Pill */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-signal/20 bg-signal/5 px-4 py-1.5 backdrop-blur-sm">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-signal shadow-glow" />
-            <span className="text-xs font-medium tracking-wide text-signal">
-              Go Ghost 👻
-            </span>
+      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center pt-24 pb-12 lg:pt-0">
+        
+        {/* Centered Headline */}
+        <div className="text-center animate-fade-in relative z-20">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#DE0EFF]/20 bg-[#DE0EFF]/10 px-4 py-1.5 backdrop-blur-sm">
+            <span className="text-sm font-semibold tracking-wide text-[#DE0EFF]">Yo! Whats Up? 👻</span>
           </div>
-
-          {/* Main Headline */}
-          <h1 className="text-4xl font-bold leading-[1.1] tracking-tight text-bone sm:text-5xl lg:text-6xl">
-            Execute in{" "}
-            <span className="relative">
-              <span className="bg-gradient-to-r from-signal via-emerald-400 to-signal bg-clip-text text-transparent">
-                silence.
-              </span>
+          
+          <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]">
+            Let's create <br className="md:hidden" />
+            <span className="bg-gradient-to-r from-[#DE0EFF] to-[#5E0EFF] bg-clip-text text-transparent">
+              Magic
             </span>
             <br />
-            <span className="text-steel">Prove</span>{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">
-              everything.
-            </span>
+            together
           </h1>
-
-          {/* Description */}
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-slate sm:text-lg">
-            Ghost Mode is a ruthless execution engine. One goal. A hidden
-            roadmap. Three missions a day — no more. Nothing completes without
-            proof. No excuses accepted.
-          </p>
-
-          {/* Feature Points */}
-          <ul className="mt-8 space-y-3 text-sm text-steel sm:text-base">
-            {[
-              { icon: "🎯", text: "One goal, one deadline, total focus." },
-              { icon: "🤖", text: "AI builds a hidden roadmap you never see." },
-              { icon: "⚡", text: "Max 3 missions per day. Proof required." },
-              { icon: "🔪", text: "Ruthless Decision Filter kills distractions." },
-            ].map((item) => (
-              <li key={item.text} className="flex items-center gap-3">
-                <span className="text-base">{item.icon}</span>
-                <span>{item.text}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* Hero Photo Section — Mobile Only */}
-          <div className="relative mt-10 flex justify-center lg:hidden">
-            <div className="hero-photo-wrapper relative">
-              {/* Glow Ring */}
-              <div className="absolute inset-0 -m-3 rounded-full bg-gradient-to-tr from-signal/30 via-purple-500/20 to-signal/30 blur-xl" />
-              <div className="relative h-48 w-48 overflow-hidden rounded-full border-2 border-signal/30 shadow-[0_0_40px_rgba(4,186,99,0.3)]">
-                <Image
-                  src="/hero-photo.jpg"
-                  alt="Ghost Mode Creator"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Right Column: Photo + Auth */}
-        <section className="flex flex-col items-center gap-8 lg:col-span-5">
-          {/* Hero Photo — Desktop Only */}
-          <div className="relative hidden lg:block">
-            {/* Outer Glow Ring */}
-            <div
-              className="absolute -inset-6 rounded-full opacity-60 blur-2xl"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, rgba(4,186,99,0.3), rgba(139,92,246,0.3), rgba(4,186,99,0.3))",
-              }}
-            />
-            {/* Pulsing Border */}
-            <div className="absolute -inset-1 animate-pulse rounded-full bg-gradient-to-tr from-signal via-purple-500 to-signal opacity-30 blur-sm" />
-            {/* Photo Container */}
-            <div className="relative h-56 w-56 overflow-hidden rounded-full border-2 border-signal/40 shadow-[0_0_60px_rgba(4,186,99,0.25),0_0_120px_rgba(139,92,246,0.15)]">
-              <Image
-                src="/hero-photo.jpg"
-                alt="Ghost Mode Creator"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            {/* Floating Accent Dots */}
-            <div
-              className="absolute -right-4 top-4 h-3 w-3 animate-bounce rounded-full bg-signal shadow-glow"
-              style={{ animationDelay: "0s", animationDuration: "3s" }}
-            />
-            <div
-              className="absolute -left-3 bottom-8 h-2 w-2 animate-bounce rounded-full bg-purple-400"
-              style={{ animationDelay: "1s", animationDuration: "4s" }}
-            />
-            <div
-              className="absolute right-2 -bottom-2 h-2.5 w-2.5 animate-bounce rounded-full bg-emerald-300"
-              style={{ animationDelay: "2s", animationDuration: "3.5s" }}
-            />
-          </div>
-
-          {/* Auth Panel */}
-          <div className="w-full animate-fade-in">
-            <AuthPanel />
-          </div>
-        </section>
-      </div>
-
-      {/* ── About Section ── */}
-      <section id="about" className="relative z-10 border-t border-border/30 bg-void/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-5xl px-6 py-20 text-center sm:px-10">
-          <h2 className="text-3xl font-bold tracking-tight text-bone sm:text-4xl">
-            What is{" "}
-            <span className="bg-gradient-to-r from-signal to-emerald-400 bg-clip-text text-transparent">
-              Ghost Mode
-            </span>
-            ?
-          </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate sm:text-lg">
-            Ghost Mode is not another productivity app. It is an autonomous execution system
-            designed for people who are done talking and ready to prove it.
-            You set one goal. The AI breaks it down. Every day you get exactly three missions.
-            Nothing counts until you upload proof. Miss a deadline? Your phone screams at you.
-            There are no excuses in Ghost Mode — only results.
-          </p>
         </div>
-      </section>
 
-      {/* ── Features Grid ── */}
-      <section id="features" className="relative z-10 border-t border-border/30">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-          <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-bone">
-            Built for{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">
-              Ruthless Execution
-            </span>
-          </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: "👻",
-                title: "Go Ghost",
-                desc: "Work in silence. No social announcements. No hype. Just pure execution behind closed doors.",
-              },
-              {
-                icon: "🧠",
-                title: "AI Roadmap",
-                desc: "DeepSeek AI analyzes your goal and builds a hidden roadmap. You only see today's missions.",
-              },
-              {
-                icon: "📸",
-                title: "Proof Required",
-                desc: "Every task requires verifiable proof. Screenshots, links, files — or it didn't happen.",
-              },
-              {
-                icon: "🔔",
-                title: "Ruthless Alerts",
-                desc: "Miss a deadline and your phone won't stop. Pushover notifications that escalate until you deliver.",
-              },
-              {
-                icon: "💰",
-                title: "Revenue Tracking",
-                desc: "Track every naira, dollar, and euro. Know exactly where your money comes from.",
-              },
-              {
-                icon: "⚔️",
-                title: "Decision Filter",
-                desc: "AI-powered filter that kills distractions. If it doesn't serve your goal, it gets rejected.",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-2xl border border-border/50 bg-void/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-signal/30 hover:shadow-[0_0_30px_rgba(4,186,99,0.08)]"
-              >
-                <span className="text-3xl">{feature.icon}</span>
-                <h3 className="mt-4 text-lg font-semibold text-bone">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate">
-                  {feature.desc}
-                </p>
-              </div>
-            ))}
+        {/* Massive Centered Photo & Floating Props */}
+        <div className="relative mt-8 flex w-full max-w-4xl justify-center animate-fade-in" style={{ animationDelay: '0.15s' }}>
+          
+          {/* Floating Prop 1 (Left) */}
+          <div className="absolute left-[5%] top-1/4 hidden lg:block animate-bounce" style={{ animationDuration: '4s' }}>
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-gray-800 bg-[#05000a] p-4 shadow-xl">
+              <span className="text-3xl">🎯</span>
+            </div>
+            {/* Glow under prop */}
+            <div className="absolute inset-0 rounded-full shadow-[0_0_30px_rgba(222,14,255,0.4)] mix-blend-screen" />
+          </div>
+
+          {/* Floating Prop 2 (Right) */}
+          <div className="absolute right-[5%] top-1/3 hidden lg:block animate-bounce" style={{ animationDuration: '5s', animationDelay: '1s' }}>
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-gray-800 bg-[#05000a] p-4 shadow-xl">
+              <span className="text-4xl">🤖</span>
+            </div>
+            {/* Glow under prop */}
+            <div className="absolute inset-0 rounded-full shadow-[0_0_30px_rgba(4,186,99,0.3)] mix-blend-screen" />
+          </div>
+
+          {/* Main Photo Container */}
+          <div className="relative mx-auto w-[280px] sm:w-[350px] md:w-[450px] lg:w-[500px]">
+             {/* Glowing outline shape */}
+             <div className="absolute -inset-4 rounded-full border-2 border-dashed border-[#DE0EFF]/30 opacity-50 animate-spin-slow" style={{ animationDuration: '20s' }} />
+             
+             {/* Transparent Cutout Image */}
+             <Image
+               src="/hero-transparent.png"
+               alt="Creator"
+               width={600}
+               height={600}
+               className="relative z-10 w-full drop-shadow-[0_0_40px_rgba(222,14,255,0.2)]"
+               priority
+             />
+             
+             {/* Bottom fade to blend into background */}
+             <div className="absolute bottom-0 left-0 right-0 z-20 h-24 bg-gradient-to-t from-[#05000a] to-transparent" />
           </div>
         </div>
+
+        {/* Bottom Elements: Text (Left) & Login (Right) */}
+        <div className="relative z-30 mt-12 w-full max-w-7xl px-6 lg:mt-[-4rem] lg:flex lg:items-end lg:justify-between lg:px-12">
+          
+          {/* Left Text */}
+          <div className="mx-auto max-w-sm text-center lg:mx-0 lg:max-w-md lg:text-left">
+            <p className="text-base leading-relaxed text-gray-400">
+              Ghost Mode is a ruthless execution engine. One goal. A hidden roadmap. Three missions a day. Nothing completes without proof. No excuses accepted.
+            </p>
+          </div>
+
+          {/* Right Auth / Login Panel */}
+          <div className="mx-auto mt-12 w-full max-w-md lg:mx-0 lg:mt-0">
+             <div className="rounded-2xl border border-white/10 bg-[#0a0a0a]/80 p-1 shadow-2xl backdrop-blur-xl">
+               <AuthPanel />
+             </div>
+          </div>
+          
+        </div>
       </section>
-
-      {/* ── Footer ── */}
-      <footer className="relative z-10 border-t border-border/30 px-6 py-8 text-center">
-        <p className="text-xs text-steel">
-          © {new Date().getFullYear()} Ghost Mode by Digital Winch. No hype. No excuses. Only execution.
-        </p>
-      </footer>
-
 
     </main>
   );
