@@ -270,27 +270,7 @@ export default async function Home() {
         </p>
       </footer>
 
-      {/* ── CSS Animations ── */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) translateX(0);
-            opacity: 0.3;
-          }
-          25% {
-            transform: translateY(-20px) translateX(10px);
-            opacity: 0.8;
-          }
-          50% {
-            transform: translateY(-10px) translateX(-10px);
-            opacity: 0.5;
-          }
-          75% {
-            transform: translateY(-30px) translateX(5px);
-            opacity: 0.7;
-          }
-        }
-      `}</style>
+
     </main>
   );
 }
