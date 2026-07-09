@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-void: #ffffff;
+  --color-signal: #04ba63;
+  --color-deep-green: #045f30;
+  --color-bone: #09090b;
+  --color-steel: #71717a;
+  --color-slate: #52525b;
+  --color-surface: #f4f4f5;
+  --color-surface-2: #e4e4e7;
+  --color-border: #d4d4d8;
+}
+
+.dark {
+  --color-void: #040404;
+  --color-signal: #04ba63;
+  --color-deep-green: #045f30;
+  --color-bone: #ebeaeb;
+  --color-steel: #606060;
+  --color-slate: #7c7c84;
+  --color-surface: #0a0a0a;
+  --color-surface-2: #101011;
+  --color-border: #1c1c1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--color-void);
+  color: var(--color-bone);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(4, 186, 99, 0.28);
+  color: var(--color-bone);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate);
+}
+
+@layer components {
+  .gm-input {
+    @apply w-full rounded-lg border border-border bg-surface px-4 py-3 text-bone
+      placeholder:text-steel focus:border-signal focus:outline-none focus:ring-1 focus:ring-signal
+      transition-colors;
+  }
+
+  .gm-label {
+    @apply mb-2 block text-sm font-medium text-slate;
+  }
+
+  .gm-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold
+      transition-all disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .gm-btn-primary {
+    @apply gm-btn bg-signal text-void hover:shadow-glow hover:brightness-110;
+  }
+
+  .gm-btn-ghost {
+    @apply gm-btn border border-border bg-transparent text-bone hover:border-signal hover:text-signal;
+  }
+
+  .gm-card {
+    @apply rounded-xl border border-border bg-surface p-6;
+  }
+
+  .gm-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-medium text-slate;
+  }
+}

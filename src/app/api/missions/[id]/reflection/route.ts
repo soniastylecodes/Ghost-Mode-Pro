@@ -1,0 +1,50 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
+
+const reflectionSchema = z.object({
+  whatGotDone: z.string().min(1),
+  whatSlowedYouDown: z.string().min(1),
+  whatYouLearned: z.string().min(1),
+  focusScore: z.number().min(1).max(5),
+});
+
+export async function POST(req: Request, context: { params: { id: string } }) {
+  try {
+    const userId = await requireUserId();
+    const missionId = context.params.id;
+
+    // verify mission belongs to user
+    const mission = await prisma.mission.findUnique({
+      where: { id: missionId },
+      include: { goal: true }
+    });
+
+    if (!mission || mission.goal.userId !== userId) {
+      return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+    }
+
+    const parsed = reflectionSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+    }
+
+    const reflection = await prisma.reflection.create({
+      data: {
+        missionId,
+        whatGotDone: parsed.data.whatGotDone,
+        whatSlowedYouDown: parsed.data.whatSlowedYouDown,
+        whatYouLearned: parsed.data.whatYouLearned,
+        focusScore: parsed.data.focusScore,
+      }
+    });
+
+    return NextResponse.json({ reflectionId: reflection.id }, { status: 201 });
+  } catch (err) {
+    if ((err as Error).message === "UNAUTHORIZED")
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error("Reflection error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

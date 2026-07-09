@@ -1,0 +1,385 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { TaskCard, type TaskWithProofs } from "./TaskCard";
+import { ProofModal } from "./ProofModal";
+import { FocusScreen } from "./FocusScreen";
+
+interface SecondaryTaskLite {
+  id: string;
+  objective: string;
+  status: "pending" | "complete";
+}
+
+interface Mission {
+  id: string;
+  summary: string | null;
+  status: string;
+  primaryTasks: TaskWithProofs[];
+  secondaryTasks: SecondaryTaskLite[];
+}
+
+interface GoalLite {
+  id: string;
+  title: string;
+  deadline: string;
+}
+
+interface PhaseLite {
+  name: string;
+  objective: string;
+}
+
+export function TodayView() {
+  const [mission, setMission] = useState<Mission | null>(null);
+  const [goal, setGoal] = useState<GoalLite | null>(null);
+  const [phase, setPhase] = useState<PhaseLite | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [activeTask, setActiveTask] = useState<TaskWithProofs | null>(null);
+  const [focusTask, setFocusTask] = useState<TaskWithProofs | null>(null);
+
+  // Custom Task State
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [taskType, setTaskType] = useState<"primary" | "secondary">("primary");
+  const [newTaskObjective, setNewTaskObjective] = useState("");
+  const [newTaskDuration, setNewTaskDuration] = useState("60");
+  const [newTaskOutcome, setNewTaskOutcome] = useState("");
+  const [isSubmittingTask, setIsSubmittingTask] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch("/api/missions/today");
+    const data = await res.json();
+    setMission(data.mission);
+    setGoal(data.goal);
+    setPhase(data.phase);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function generate() {
+    setGenerating(true);
+    const res = await fetch("/api/missions/today", { method: "POST" });
+    const data = await res.json();
+    if (data.mission) setMission(data.mission);
+    if (data.phase) setPhase(data.phase);
+    setGenerating(false);
+  }
+
+  async function toggleSecondary(taskId: string, currentStatus: "pending" | "complete") {
+    if (!mission) return;
+    const newStatus = currentStatus === "complete" ? "pending" : "complete";
+
+    // Optimistically update UI
+    setMission((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        secondaryTasks: prev.secondaryTasks.map((t) =>
+          t.id === taskId ? { ...t, status: newStatus } : t
+        ),
+      };
+    });
+
+    try {
+      const res = await fetch("/api/tasks/secondary", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId, status: newStatus }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update task");
+      }
+    } catch (err) {
+      console.error(err);
+      // Revert UI on failure
+      setMission((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          secondaryTasks: prev.secondaryTasks.map((t) =>
+            t.id === taskId ? { ...t, status: currentStatus } : t
+          ),
+        };
+      });
+    }
+  }
+
+  async function handleAddCustomTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!mission || !newTaskObjective) return;
+    setIsSubmittingTask(true);
+
+    try {
+      const res = await fetch("/api/tasks/custom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          missionId: mission.id,
+          type: taskType,
+          objective: newTaskObjective,
+          estDuration: Number(newTaskDuration),
+          expectedOutcome: newTaskOutcome,
+        }),
+      });
+      if (res.ok) {
+        setIsAddingTask(false);
+        setNewTaskObjective("");
+        setNewTaskOutcome("");
+        setNewTaskDuration("60");
+        await load(); // Reload to get updated mission
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmittingTask(false);
+    }
+  }
+
+  const completedPrimary =
+    mission?.primaryTasks.filter((t) => t.status === "complete").length ?? 0;
+  const totalPrimary = mission?.primaryTasks.length ?? 0;
+
+  const completedSecondary =
+    mission?.secondaryTasks.filter((t) => t.status === "complete").length ?? 0;
+  const totalSecondary = mission?.secondaryTasks.length ?? 0;
+
+  const totalCompleted = completedPrimary + completedSecondary;
+  const totalTasks = totalPrimary + totalSecondary;
+
+  if (loading) {
+    return <p className="text-slate">Loading today’s mission…</p>;
+  }
+
+  return (
+    <div className="animate-fade-in">
+      <div className="mb-8">
+        <p className="text-sm font-medium uppercase tracking-widest text-signal">
+          Today’s Mission
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold text-bone">
+          {goal?.title}
+        </h1>
+        {phase && (
+          <div className="mt-3 p-4 rounded-lg bg-surface border border-border">
+            <p className="text-xs font-semibold uppercase text-steel">Phase: {phase.name}</p>
+            <p className="text-sm text-slate mt-1">{phase.objective}</p>
+          </div>
+        )}
+      </div>
+
+      {!mission ? (
+        <div className="gm-card text-center">
+          <p className="text-slate">
+            No mission issued yet today. Ghost Mode will assign up to 3 Primary
+            Missions and up to 4 Secondary Tasks based on your hidden roadmap.
+          </p>
+          <button
+            onClick={generate}
+            disabled={generating}
+            className="gm-btn-primary mt-6"
+          >
+            {generating ? "Assigning…" : "Get today’s mission"}
+          </button>
+        </div>
+      ) : (
+        <>
+          {mission.summary && (
+            <div className="mb-6 rounded-xl border border-border bg-surface p-4">
+              <p className="text-sm leading-relaxed text-slate">
+                {mission.summary}
+              </p>
+              <p className="mt-3 text-xs text-steel">
+                Primary: {completedPrimary}/{totalPrimary} complete
+                {totalSecondary > 0 && ` · Secondary: ${completedSecondary}/${totalSecondary} complete`}
+              </p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-signal transition-all"
+                  style={{
+                    width: `${
+                      totalTasks ? (totalCompleted / totalTasks) * 100 : 0
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-8">
+            {/* Primary Tasks */}
+            {totalPrimary > 0 && (
+              <div>
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-signal">
+                  Primary Missions (Proof Required)
+                </h2>
+                <div className="space-y-4">
+                  {mission.primaryTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onSubmitProof={() => setActiveTask(task)}
+                      onFocus={() => setFocusTask(task)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Secondary Tasks */}
+            {totalSecondary > 0 && (
+              <div>
+                <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-steel">
+                  Secondary Tasks (Checkbox Only)
+                </h2>
+                <div className="gm-card divide-y divide-border/40 p-0">
+                  {mission.secondaryTasks.map((task) => (
+                    <label
+                      key={task.id}
+                      className="flex cursor-pointer items-center gap-3 p-4 select-none text-slate transition-colors hover:bg-surface/30 hover:text-bone"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={task.status === "complete"}
+                        onChange={() => toggleSecondary(task.id, task.status)}
+                        className="h-4.5 w-4.5 cursor-pointer rounded border-steel bg-void text-signal focus:ring-signal focus:ring-offset-void focus:ring-2 focus:ring-offset-2 accent-signal"
+                      />
+                      <span
+                        className={`text-sm ${
+                          task.status === "complete"
+                            ? "line-through text-steel"
+                            : ""
+                        }`}
+                      >
+                        {task.objective}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Add Custom Task Form */}
+            <div className="pt-4 border-t border-border">
+              {!isAddingTask ? (
+                <button
+                  onClick={() => setIsAddingTask(true)}
+                  className="text-sm font-medium text-signal hover:text-signal/80 transition-colors flex items-center gap-2"
+                >
+                  <span className="text-lg">+</span> Add Custom Task
+                </button>
+              ) : (
+                <form onSubmit={handleAddCustomTask} className="gm-card space-y-4 animate-fade-in p-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-bone">Add Custom Task</h3>
+                    <button type="button" onClick={() => setIsAddingTask(false)} className="text-slate hover:text-bone text-xs">Cancel</button>
+                  </div>
+                  
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="text-xs text-steel mb-1.5 block">Objective</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={newTaskObjective}
+                        onChange={(e) => setNewTaskObjective(e.target.value)}
+                        placeholder="What do you need to do?"
+                        className="gm-input w-full" 
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-xs text-steel mb-1.5 block">Task Type</label>
+                      <select 
+                        value={taskType}
+                        onChange={(e) => setTaskType(e.target.value as "primary" | "secondary")}
+                        className="gm-input w-full"
+                      >
+                        <option value="primary">Primary (Requires Proof)</option>
+                        <option value="secondary">Secondary (Checkbox)</option>
+                      </select>
+                    </div>
+
+                    {taskType === "primary" && (
+                      <div>
+                        <label className="text-xs text-steel mb-1.5 block">Est. Duration (min)</label>
+                        <input 
+                          type="number" 
+                          required 
+                          min="5"
+                          value={newTaskDuration}
+                          onChange={(e) => setNewTaskDuration(e.target.value)}
+                          className="gm-input w-full" 
+                        />
+                      </div>
+                    )}
+
+                    {taskType === "primary" && (
+                      <div className="sm:col-span-2">
+                        <label className="text-xs text-steel mb-1.5 block">Expected Outcome (For Proof)</label>
+                        <input 
+                          type="text" 
+                          required 
+                          value={newTaskOutcome}
+                          onChange={(e) => setNewTaskOutcome(e.target.value)}
+                          placeholder="e.g. A screenshot of the launched campaign"
+                          className="gm-input w-full" 
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmittingTask || !newTaskObjective} 
+                    className="gm-btn-primary w-full"
+                  >
+                    {isSubmittingTask ? "Adding..." : "Add Task"}
+                  </button>
+                </form>
+              )}
+            </div>
+
+          </div>
+
+          {completedPrimary === totalPrimary && totalPrimary > 0 && (
+            <div className="mt-8 rounded-xl border border-deep-green/60 bg-deep-green/10 p-5 text-center">
+              <p className="font-semibold text-signal">
+                Primary Missions complete. Roadmap advanced.
+              </p>
+              <p className="mt-1 text-sm text-slate">
+                Rest is earned. Return tomorrow for the next mission.
+              </p>
+            </div>
+          )}
+        </>
+      )}
+
+      {activeTask && (
+        <ProofModal
+          task={activeTask}
+          onClose={() => setActiveTask(null)}
+          onResolved={async () => {
+            setActiveTask(null);
+            await load();
+          }}
+        />
+      )}
+
+      {focusTask && (
+        <FocusScreen
+          task={focusTask}
+          onExit={() => setFocusTask(null)}
+          onSubmitProof={() => {
+            setActiveTask(focusTask);
+            setFocusTask(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
