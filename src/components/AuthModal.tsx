@@ -82,7 +82,7 @@ export function AuthModal({ isOpen, initialMode = "signup", onClose }: AuthModal
 
       {/* Modal Card */}
       <div
-        className="auth-modal-card relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0f] p-8 shadow-[0_0_80px_rgba(222,14,255,0.15)] animate-modal-in"
+        className="auth-modal-card relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0f] p-8 shadow-[0_0_80px_rgba(4,186,99,0.1)] animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -114,7 +114,7 @@ export function AuthModal({ isOpen, initialMode = "signup", onClose }: AuthModal
               onClick={() => { setMode(m); setError(null); }}
               className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
                 mode === m
-                  ? "bg-[#DE0EFF] text-white shadow-[0_0_20px_rgba(222,14,255,0.4)]"
+                  ? "bg-[#04ba63] text-black shadow-[0_0_20px_rgba(4,186,99,0.3)]"
                   : "text-gray-500 hover:text-gray-300"
               }`}
             >

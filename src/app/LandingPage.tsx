@@ -18,10 +18,9 @@ export default function LandingPage() {
   return (
     <main className="landing-root">
 
-      {/* ── Ambient background glows ── */}
+      {/* Ambient glows */}
       <div className="landing-glow-1" />
       <div className="landing-glow-2" />
-      <div className="landing-glow-3" />
 
       {/* ── Navbar ── */}
       <header className="landing-nav">
@@ -45,84 +44,66 @@ export default function LandingPage() {
             className="landing-btn-primary"
             onClick={() => openModal("signup")}
           >
-            Start Free →
+            Get Started
           </button>
         </div>
       </header>
 
-      {/* ── Hero ── */}
+      {/* ── Hero (100vh) ── */}
       <section className="landing-hero">
 
-        {/* Badge pill */}
+        {/* Badge */}
         <div className="landing-badge">
           <span className="landing-badge-dot" />
-          <span>Ghost Mode is live</span>
-          <span className="landing-badge-sep">·</span>
-          <span className="landing-badge-sub">No credit card required</span>
+          <span>Now live — free to start</span>
         </div>
 
         {/* Headline */}
         <h1 className="landing-h1">
-          The AI execution engine<br />
-          <span className="landing-h1-accent">that runs your life</span>
+          Execute in silence.
+          <br />
+          <span className="landing-h1-accent">Let results speak.</span>
         </h1>
 
-        {/* Sub-headline */}
+        {/* Sub */}
         <p className="landing-sub">
-          One locked goal. A hidden roadmap. Three ruthless missions a day.<br />
-          Nothing marks done without proof. No excuses accepted.
+          One goal. A hidden roadmap. Three missions daily.
+          <br />
+          Nothing counts without proof. No excuses.
         </p>
+
+        {/* Single CTA */}
+        <button
+          id="hero-start-btn"
+          className="landing-btn-hero"
+          onClick={() => openModal("signup")}
+        >
+          Enter Ghost Mode →
+        </button>
 
         {/* Stat pills */}
         <div className="landing-stats">
-          <div className="landing-stat-pill">
-            <span>🎯</span> One goal at a time
-          </div>
-          <div className="landing-stat-pill">
-            <span>🤖</span> AI-verified proof
-          </div>
-          <div className="landing-stat-pill">
-            <span>🔥</span> Daily streak tracking
-          </div>
+          <div className="landing-stat-pill">🎯 One goal at a time</div>
+          <div className="landing-stat-pill">🤖 AI-verified proof</div>
+          <div className="landing-stat-pill">🔥 Daily streak engine</div>
         </div>
-
-        {/* CTA buttons */}
-        <div className="landing-cta-row">
-          <button
-            id="hero-start-btn"
-            className="landing-btn-hero"
-            onClick={() => openModal("signup")}
-          >
-            Start executing – it&apos;s free →
-          </button>
-          <button
-            id="hero-signin-btn"
-            className="landing-btn-ghost-lg"
-            onClick={() => openModal("signin")}
-          >
-            Already a ghost? Sign in
-          </button>
-        </div>
-
-        {/* Social proof */}
-        <p className="landing-proof">
-          Join builders who stopped talking and started executing.
-        </p>
       </section>
 
       {/* ── Feature Cards ── */}
       <section id="features" className="landing-features-section">
-        <h2 className="landing-section-title">Built for ruthless execution</h2>
-        <p className="landing-section-sub">Every feature is designed to eliminate excuses and force progress.</p>
+        <h2 className="landing-section-title">Built to eliminate excuses</h2>
+        <p className="landing-section-sub">
+          Every feature forces you forward. No fluff. No motivation quotes.
+        </p>
 
         <div className="landing-cards-grid">
           {[
-            { icon: "👻", title: "Ghost Mode On", desc: "No distractions. No social media. Just your goal and the work." },
-            { icon: "🗺️", title: "Hidden Roadmap", desc: "AI builds your roadmap. You only see today's mission — no overwhelm." },
-            { icon: "📸", title: "Proof of Work", desc: "Every task requires proof. AI reviews it. No proof = not done." },
-            { icon: "🔥", title: "Streak Engine", desc: "Your streak is your identity. Miss a day and face yourself in the mirror." },
-            { icon: "💰", title: "Revenue Tracker", desc: "Track every naira, dollar, or pound earned. Watch your hustle compound." },
-            { icon: "🧠", title: "Weekly Reviews", desc: "AI analyses your week. Bottlenecks, wins, and what to double down on." },
+            { icon: "👻", title: "Ghost Mode", desc: "Lock in. No social. No noise. Just you, your goal, and the work." },
+            { icon: "🗺️", title: "Hidden Roadmap", desc: "AI builds your path. You only see today. No overwhelm, no paralysis." },
+            { icon: "📸", title: "Proof of Work", desc: "Submit proof for every task. AI grades it. Fail = not done." },
+            { icon: "🔥", title: "Streak Engine", desc: "Your streak is your identity. Guard it like your life depends on it." },
+            { icon: "💰", title: "Revenue Log", desc: "Track every coin earned. See your hustle turn into income." },
+            { icon: "🧠", title: "Weekly Review", desc: "AI diagnoses your week. Wins, bottlenecks, and the brutal truth." },
           ].map((f) => (
             <div key={f.title} className="landing-card">
               <div className="landing-card-icon">{f.icon}</div>
@@ -136,26 +117,26 @@ export default function LandingPage() {
       {/* ── Bottom CTA ── */}
       <section className="landing-bottom-cta">
         <div className="landing-glow-bottom" />
-        <h2 className="landing-bottom-title">Ready to go ghost?</h2>
+        <h2 className="landing-bottom-title">Ready to stop talking?</h2>
         <p className="landing-bottom-sub">
-          Stop planning. Stop scrolling. Start executing.
+          Ghost Mode doesn&apos;t motivate you. It holds you accountable.
         </p>
         <button
           id="bottom-start-btn"
           className="landing-btn-hero"
           onClick={() => openModal("signup")}
         >
-          Enter Ghost Mode – Free →
+          Start executing — it&apos;s free →
         </button>
       </section>
 
       {/* ── Footer ── */}
       <footer className="landing-footer">
-        <GhostLogo size={24} withWordmark />
+        <GhostLogo size={22} withWordmark />
         <p>© {new Date().getFullYear()} Ghost Mode. Built for executors only.</p>
       </footer>
 
-      {/* ── Auth Modal ── */}
+      {/* Auth Modal */}
       <AuthModal
         isOpen={modalOpen}
         initialMode={modalMode}
