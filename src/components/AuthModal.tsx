@@ -52,13 +52,30 @@ export function AuthModal({ isOpen, initialMode = "signup", onClose }: AuthModal
         await account.create(ID.unique(), email, password, name);
       }
       await account.createEmailPasswordSession(email, password);
-      const syncRes = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!syncRes.ok) {
-        const data = await syncRes.json();
-        throw new Error(data.error || "Could not sync account with database");
+      // 3. Ensure the User and Streak documents exist in the Appwrite Database directly
+      try {
+        const user = await account.get();
+        try {
+          await import("@/lib/appwrite-client").then((m) =>
+            m.databases.getDocument("ghost_mode", "User", user.$id)
+          );
+        } catch (dbError: any) {
+          if (dbError.code === 404) {
+            // Create user document
+            const { databases } = await import("@/lib/appwrite-client");
+            await databases.createDocument("ghost_mode", "User", user.$id, {
+              email: user.email,
+              name: user.name || "Ghost",
+            });
+            // Create streak document
+            await databases.createDocument("ghost_mode", "Streak", ID.unique(), {
+              user: user.$id,
+            });
+          }
+        }
+      } catch (syncErr) {
+        console.error("Database sync failed:", syncErr);
+        // Continue to dashboard anyway since auth succeeded
       }
       router.push("/today");
       router.refresh();
