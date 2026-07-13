@@ -39,7 +39,7 @@ export default function LandingPage() {
         <div className="landing-nav-cta">
           <button
             id="nav-signin-btn"
-            className="landing-btn-ghost"
+            className="landing-btn-ghost hidden md:inline-flex"
             onClick={() => openModal("signin")}
           >
             Sign In
