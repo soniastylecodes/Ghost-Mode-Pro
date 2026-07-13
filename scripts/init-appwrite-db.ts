@@ -9,6 +9,8 @@ const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
 const apiKey = process.env.APPWRITE_API_KEY;
 const databaseId = "ghost_mode";
 
+console.log("Appwrite Config Debug -> Endpoint:", endpoint, "Project ID:", projectId);
+
 if (!projectId || !apiKey) {
   console.error("Error: NEXT_PUBLIC_APPWRITE_PROJECT_ID and APPWRITE_API_KEY must be defined in your environment.");
   process.exit(1);
@@ -23,11 +25,28 @@ const databases = new Databases(client);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function withRetry<T>(fn: () => Promise<T>, retries = 5, delayMs = 3000): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      const isTimeout = err?.cause?.code === 'UND_ERR_CONNECT_TIMEOUT' || err?.message === 'fetch failed';
+      if (isTimeout && attempt < retries) {
+        console.log(`\nNetwork timeout, retrying (${attempt}/${retries})...`);
+        await sleep(delayMs * attempt);
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 async function waitForAttributes(collectionId: string, expectedKeys: string[]) {
   process.stdout.write(`Waiting for attributes in ${collectionId} to process...`);
   while (true) {
     try {
-      const collection = await databases.getCollection(databaseId, collectionId);
+      const collection = await withRetry(() => databases.getCollection(databaseId, collectionId));
       const attributes = collection.attributes;
       const allAvailable = expectedKeys.every((key) => {
         const attr = attributes.find((a: any) => a.key === key);
@@ -140,7 +159,7 @@ async function main() {
         await databases.createIntegerAttribute(databaseId, "Streak", "longest", false, 0, undefined, 0);
         await databases.createDatetimeAttribute(databaseId, "Streak", "lastActiveDate", false);
         await databases.createIntegerAttribute(databaseId, "Streak", "totalFocusMinutes", false, 0, undefined, 0);
-        await databases.createStringAttribute(databaseId, "Streak", "calendarDays", 16384, false);
+        await databases.createStringAttribute(databaseId, "Streak", "calendarDays", 2000, false);
         await waitForAttributes("Streak", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -150,14 +169,14 @@ async function main() {
       const keys = ["title", "description", "deadline", "status", "statement", "targetNumber", "reason", "definitionOfSuccess", "outcomeThreads"];
       try {
         await databases.createStringAttribute(databaseId, "Goal", "title", 255, true);
-        await databases.createStringAttribute(databaseId, "Goal", "description", 4096, false);
+        await databases.createStringAttribute(databaseId, "Goal", "description", 2000, false);
         await databases.createDatetimeAttribute(databaseId, "Goal", "deadline", true);
         await databases.createStringAttribute(databaseId, "Goal", "status", 50, false, "active");
-        await databases.createStringAttribute(databaseId, "Goal", "statement", 4096, false);
+        await databases.createStringAttribute(databaseId, "Goal", "statement", 2000, false);
         await databases.createFloatAttribute(databaseId, "Goal", "targetNumber", false);
-        await databases.createStringAttribute(databaseId, "Goal", "reason", 4096, false);
-        await databases.createStringAttribute(databaseId, "Goal", "definitionOfSuccess", 4096, false);
-        await databases.createStringAttribute(databaseId, "Goal", "outcomeThreads", 16384, false);
+        await databases.createStringAttribute(databaseId, "Goal", "reason", 2000, false);
+        await databases.createStringAttribute(databaseId, "Goal", "definitionOfSuccess", 2000, false);
+        await databases.createStringAttribute(databaseId, "Goal", "outcomeThreads", 2000, false);
         await waitForAttributes("Goal", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -189,9 +208,9 @@ async function main() {
     async () => {
       const keys = ["phases", "currentPhase", "rawPlan"];
       try {
-        await databases.createStringAttribute(databaseId, "Roadmap", "phases", 32768, true);
+        await databases.createStringAttribute(databaseId, "Roadmap", "phases", 2000, true);
         await databases.createIntegerAttribute(databaseId, "Roadmap", "currentPhase", false, 0, undefined, 0);
-        await databases.createStringAttribute(databaseId, "Roadmap", "rawPlan", 32768, false);
+        await databases.createStringAttribute(databaseId, "Roadmap", "rawPlan", 2000, false);
         await waitForAttributes("Roadmap", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -241,9 +260,9 @@ async function main() {
       const keys = ["type", "content", "verdict", "reason"];
       try {
         await databases.createStringAttribute(databaseId, "Proof", "type", 50, true);
-        await databases.createStringAttribute(databaseId, "Proof", "content", 8192, true);
+        await databases.createStringAttribute(databaseId, "Proof", "content", 2000, true);
         await databases.createStringAttribute(databaseId, "Proof", "verdict", 50, false);
-        await databases.createStringAttribute(databaseId, "Proof", "reason", 4096, false);
+        await databases.createStringAttribute(databaseId, "Proof", "reason", 1000, false);
         await waitForAttributes("Proof", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -282,10 +301,10 @@ async function main() {
         await databases.createIntegerAttribute(databaseId, "AppSettings", "maxPrimaryTasks", false, 1, 10, 3);
         await databases.createIntegerAttribute(databaseId, "AppSettings", "maxSecondaryTasks", false, 1, 10, 4);
         await databases.createStringAttribute(databaseId, "AppSettings", "pushoverAppToken", 255, false);
-        await databases.createStringAttribute(databaseId, "AppSettings", "roadmapSystemPrompt", 16384, false);
-        await databases.createStringAttribute(databaseId, "AppSettings", "missionSystemPrompt", 16384, false);
-        await databases.createStringAttribute(databaseId, "AppSettings", "proofSystemPrompt", 16384, false);
-        await databases.createStringAttribute(databaseId, "AppSettings", "decisionSystemPrompt", 16384, false);
+        await databases.createStringAttribute(databaseId, "AppSettings", "roadmapSystemPrompt", 2000, false);
+        await databases.createStringAttribute(databaseId, "AppSettings", "missionSystemPrompt", 2000, false);
+        await databases.createStringAttribute(databaseId, "AppSettings", "proofSystemPrompt", 2000, false);
+        await databases.createStringAttribute(databaseId, "AppSettings", "decisionSystemPrompt", 2000, false);
         await waitForAttributes("AppSettings", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -294,9 +313,9 @@ async function main() {
     async () => {
       const keys = ["whatGotDone", "whatSlowedYouDown", "whatYouLearned", "focusScore"];
       try {
-        await databases.createStringAttribute(databaseId, "Reflection", "whatGotDone", 4096, true);
-        await databases.createStringAttribute(databaseId, "Reflection", "whatSlowedYouDown", 4096, true);
-        await databases.createStringAttribute(databaseId, "Reflection", "whatYouLearned", 4096, true);
+        await databases.createStringAttribute(databaseId, "Reflection", "whatGotDone", 2000, true);
+        await databases.createStringAttribute(databaseId, "Reflection", "whatSlowedYouDown", 2000, true);
+        await databases.createStringAttribute(databaseId, "Reflection", "whatYouLearned", 2000, true);
         await databases.createIntegerAttribute(databaseId, "Reflection", "focusScore", true, 1, 10);
         await waitForAttributes("Reflection", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
@@ -312,8 +331,8 @@ async function main() {
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "missionCompletionPct", true);
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "revenue", true);
         await databases.createIntegerAttribute(databaseId, "WeeklyReview", "momentumScore", true);
-        await databases.createStringAttribute(databaseId, "WeeklyReview", "bottleneck", 4096, true);
-        await databases.createStringAttribute(databaseId, "WeeklyReview", "recommendation", 4096, true);
+        await databases.createStringAttribute(databaseId, "WeeklyReview", "bottleneck", 2000, true);
+        await databases.createStringAttribute(databaseId, "WeeklyReview", "recommendation", 2000, true);
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "incomeProgress", true);
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "leadsFollowedUpPct", true);
         await waitForAttributes("WeeklyReview", keys);
@@ -325,9 +344,9 @@ async function main() {
       const keys = ["name", "principleToLearn", "notes", "imageUrl"];
       try {
         await databases.createStringAttribute(databaseId, "RoleModel", "name", 255, true);
-        await databases.createStringAttribute(databaseId, "RoleModel", "principleToLearn", 2048, true);
-        await databases.createStringAttribute(databaseId, "RoleModel", "notes", 4096, false);
-        await databases.createStringAttribute(databaseId, "RoleModel", "imageUrl", 2048, false);
+        await databases.createStringAttribute(databaseId, "RoleModel", "principleToLearn", 1000, true);
+        await databases.createStringAttribute(databaseId, "RoleModel", "notes", 2000, false);
+        await databases.createStringAttribute(databaseId, "RoleModel", "imageUrl", 512, false);
         await waitForAttributes("RoleModel", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -340,7 +359,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Lead", "source", 255, false);
         await databases.createStringAttribute(databaseId, "Lead", "status", 50, false, "new");
         await databases.createDatetimeAttribute(databaseId, "Lead", "nextFollowUpDate", false);
-        await databases.createStringAttribute(databaseId, "Lead", "notes", 4096, false);
+        await databases.createStringAttribute(databaseId, "Lead", "notes", 2000, false);
         await waitForAttributes("Lead", keys);
       } catch (err: any) { if (err.code !== 409) throw err; }
     },
@@ -350,7 +369,7 @@ async function main() {
       const keys = ["amount", "description", "source", "currency", "originalAmount", "date"];
       try {
         await databases.createFloatAttribute(databaseId, "RevenueLog", "amount", true);
-        await databases.createStringAttribute(databaseId, "RevenueLog", "description", 2048, true);
+        await databases.createStringAttribute(databaseId, "RevenueLog", "description", 1000, true);
         await databases.createStringAttribute(databaseId, "RevenueLog", "source", 255, false);
         await databases.createStringAttribute(databaseId, "RevenueLog", "currency", 10, false, "NGN");
         await databases.createFloatAttribute(databaseId, "RevenueLog", "originalAmount", false);
@@ -361,7 +380,7 @@ async function main() {
   ];
 
   for (const op of attributeOperations) {
-    await op();
+    await withRetry(() => op(), 5, 2000);
   }
 
   // 4. Create Relationships
@@ -497,7 +516,7 @@ async function main() {
   ];
 
   for (const op of relationshipOperations) {
-    await op();
+    await withRetry(() => op(), 5, 2000);
   }
 
   console.log("\nAppwrite Database provisioning finished successfully!");
