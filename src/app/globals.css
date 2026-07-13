@@ -26,7 +26,7 @@
   --color-border:   #1c1c1d;
 }
 
-[data-theme="light"] {
+.light {
   --bg:        #f9f9fb;
   --surface:   #ffffff;
   --border:    rgba(0,0,0,0.1);
@@ -159,7 +159,7 @@ html, body {
     padding: 1rem 2.5rem;
   }
 }
-[data-theme="light"] .landing-nav {
+.light .landing-nav {
   background: rgba(255,255,255,0.75);
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
@@ -200,11 +200,11 @@ html, body {
   transition: color 0.2s, border-color 0.2s;
 }
 .landing-btn-ghost:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
-[data-theme="light"] .landing-btn-ghost {
+.light .landing-btn-ghost {
   border-color: rgba(0,0,0,0.15);
   color: #3f3f46;
 }
-[data-theme="light"] .landing-btn-ghost:hover { border-color: rgba(0,0,0,0.4); color: #000; }
+.light .landing-btn-ghost:hover { border-color: rgba(0,0,0,0.4); color: #000; }
 
 .landing-btn-primary {
   padding: 0.45rem 1.1rem;
@@ -332,7 +332,7 @@ html, body {
   color: var(--muted);
   font-weight: 500;
 }
-[data-theme="light"] .landing-stat-pill {
+.light .landing-stat-pill {
   border-color: rgba(0,0,0,0.1);
   background: rgba(0,0,0,0.02);
 }
@@ -458,17 +458,17 @@ html, body {
   border-color: rgba(4,186,99,0.5);
   box-shadow: 0 0 0 3px rgba(4,186,99,0.08);
 }
-[data-theme="light"] .auth-input {
+.light .auth-input {
   background: rgba(0,0,0,0.02);
   border: 1px solid rgba(0,0,0,0.15);
   color: #000;
 }
-[data-theme="light"] .auth-modal-card {
+.light .auth-modal-card {
   background: #ffffff;
   border-color: rgba(0,0,0,0.1);
   box-shadow: 0 0 80px rgba(4,186,99,0.05);
 }
-[data-theme="light"] .auth-modal-card h2 { color: #000; }
+.light .auth-modal-card h2 { color: #000; }
 
 .auth-submit-btn {
   width: 100%;

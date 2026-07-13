@@ -5,6 +5,20 @@ import { AuthModal } from "@/components/AuthModal";
 import { GhostLogo } from "@/components/GhostLogo";
 import { Particles } from "@/components/Particles";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { motion } from "framer-motion";
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
 
 type Mode = "signin" | "signup";
 
@@ -55,53 +69,73 @@ export default function LandingPage() {
       </header>
 
       {/* ── Hero (100vh) ── */}
-      <section className="landing-hero">
-
+      <motion.section
+        className="landing-hero"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Badge */}
-        <div className="landing-badge">
+        <motion.div variants={fadeInUp} className="landing-badge">
           <span className="landing-badge-dot" />
           <span>Now live — free to start</span>
-        </div>
+        </motion.div>
 
         {/* Headline */}
-        <h1 className="landing-h1">
+        <motion.h1 variants={fadeInUp} className="landing-h1">
           Execute in silence.
           <br />
           <span className="landing-h1-accent">Let results speak.</span>
-        </h1>
+        </motion.h1>
 
         {/* Sub */}
-        <p className="landing-sub">
+        <motion.p variants={fadeInUp} className="landing-sub">
           One mission. One task at a time.
           <br />
           Nothing counts until you prove it.
-        </p>
+        </motion.p>
 
         {/* Single CTA */}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           id="hero-start-btn"
           className="landing-btn-hero"
           onClick={() => openModal("signup")}
         >
           Enter Ghost Mode →
-        </button>
+        </motion.button>
 
         {/* Stat pills */}
-        <div className="landing-stats">
+        <motion.div variants={fadeInUp} className="landing-stats">
           <div className="landing-stat-pill">One goal focus</div>
           <div className="landing-stat-pill">Verified proof</div>
           <div className="landing-stat-pill">Execution tracking</div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* ── Feature Cards ── */}
       <section id="features" className="landing-features-section">
-        <h2 className="landing-section-title">Built to eliminate excuses</h2>
-        <p className="landing-section-sub">
-          Every feature forces you forward. No fluff. No motivation quotes.
-        </p>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInUp}
+        >
+          <h2 className="landing-section-title">Built to eliminate excuses</h2>
+          <p className="landing-section-sub">
+            Every feature forces you forward. No fluff. No motivation quotes.
+          </p>
+        </motion.div>
 
-        <div className="landing-cards-grid">
+        <motion.div
+          className="landing-cards-grid"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={staggerContainer}
+        >
           {[
             { title: "Ghost Mode", desc: "Lock in. No social. No noise. Just you, your goal, and the work." },
             { title: "Hidden Roadmap", desc: "AI builds your path. You only see today. No overwhelm, no paralysis." },
@@ -110,29 +144,43 @@ export default function LandingPage() {
             { title: "Revenue Log", desc: "Track every coin earned. See your hustle turn into income." },
             { title: "Weekly Review", desc: "AI diagnoses your week. Wins, bottlenecks, and the brutal truth." },
           ].map((f) => (
-            <div key={f.title} className="landing-card">
+            <motion.div
+              key={f.title}
+              variants={fadeInUp}
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="landing-card"
+            >
               <h3 className="landing-card-title">{f.title}</h3>
               <p className="landing-card-desc">{f.desc}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="landing-bottom-cta">
+      <motion.section
+        className="landing-bottom-cta"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={staggerContainer}
+      >
         <div className="landing-glow-bottom" />
-        <h2 className="landing-bottom-title">Ready to stop talking?</h2>
-        <p className="landing-bottom-sub">
+        <motion.h2 variants={fadeInUp} className="landing-bottom-title">Ready to stop talking?</motion.h2>
+        <motion.p variants={fadeInUp} className="landing-bottom-sub">
           Ghost Mode doesn&apos;t motivate you. It holds you accountable.
-        </p>
-        <button
+        </motion.p>
+        <motion.button
+          variants={fadeInUp}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           id="bottom-start-btn"
           className="landing-btn-hero"
           onClick={() => openModal("signup")}
         >
           Start executing — it&apos;s free →
-        </button>
-      </section>
+        </motion.button>
+      </motion.section>
 
       {/* ── Footer ── */}
       <footer className="landing-footer">
