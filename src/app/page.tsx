@@ -39,7 +39,7 @@ export default async function Home() {
           </div>
           
           <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]">
-            Let's create <br className="md:hidden" />
+            Let&apos;s create <br className="md:hidden" />
             <span className="bg-gradient-to-r from-[#DE0EFF] to-[#5E0EFF] bg-clip-text text-transparent">
               Magic
             </span>
