@@ -1,10 +1,7 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAdminId } from "@/lib/session";
 import AdminShell from "@/components/admin/AdminShell";
 import AdminAnalyticsCards from "@/components/admin/AdminAnalyticsCards";
-
-type SessionUser = { id?: string; role?: string };
 
 import { prisma } from "@/lib/prisma";
 
@@ -56,10 +53,9 @@ async function getAnalytics() {
 export const metadata = { title: "Admin Overview — Ghost Mode" };
 
 export default async function AdminOverviewPage() {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as SessionUser | undefined;
-
-  if (!user?.id || user.role !== "admin") {
+  try {
+    await requireAdminId();
+  } catch {
     redirect("/admin/login");
   }
 

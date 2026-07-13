@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { account } from "@/lib/appwrite-client";
 import { ThemeToggle } from "../ThemeToggle";
+import { useRouter } from "next/navigation";
 
 const NAV = [
   {
@@ -38,6 +39,17 @@ const NAV = [
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await account.deleteSession("current");
+    } catch (err) {
+      console.error("Admin logout error:", err);
+    }
+    router.push("/admin/login");
+    router.refresh();
+  };
 
   return (
     <div className="flex h-screen bg-void text-bone overflow-hidden">
@@ -76,7 +88,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="p-4 border-t border-border flex items-center gap-2">
           <button
             className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-transparent py-2.5 text-sm font-medium text-slate transition-colors hover:bg-white/5 hover:text-bone"
-            onClick={() => signOut({ callbackUrl: "/admin/login" })}
+            onClick={handleSignOut}
           >
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" strokeLinecap="round"/><polyline points="16 17 21 12 16 7" strokeLinecap="round" strokeLinejoin="round"/><line x1="21" y1="12" x2="9" y2="12" strokeLinecap="round"/></svg>
             Sign out

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { account } from "@/lib/appwrite-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -17,18 +17,36 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      // 1. Authenticate with Appwrite
+      await account.createEmailPasswordSession(email, password);
 
-    if (res?.ok) {
+      // 2. Sync with database and check role
+      const syncRes = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!syncRes.ok) {
+        throw new Error("Failed to synchronize admin profile.");
+      }
+
+      const data = await syncRes.json();
+      if (data.role !== "admin") {
+        // Log out immediately if user is not admin
+        await account.deleteSession("current");
+        throw new Error("Access denied. Admin privileges required.");
+      }
+
       router.push("/admin");
-    } else {
-      setError("Invalid credentials.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid credentials.");
+      try {
+        await account.deleteSession("current");
+      } catch {}
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

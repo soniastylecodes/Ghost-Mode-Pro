@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { account } from "@/lib/appwrite-client";
 import { GhostLogo } from "./GhostLogo";
 import { ThemeToggle } from "./ThemeToggle";
+import { useRouter } from "next/navigation";
 
 const NAV = [
   { href: "/today", label: "Today's Mission" },
@@ -20,7 +21,18 @@ const NAV = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   
+  const handleSignOut = async () => {
+    try {
+      await account.deleteSession("current");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+    router.push("/");
+    router.refresh();
+  };
+
   // Exclude AppShell sidebar on the Goal Setup screen if we want, but it's fine
   // PRD: "a slim, always present interactive sidebar replaces the header."
   return (
@@ -52,7 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="p-4 border-t border-border flex items-center gap-2">
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={handleSignOut}
             className="flex-1 text-left rounded-lg px-4 py-3 text-sm font-medium text-steel hover:text-bone hover:bg-surface"
           >
             Sign out

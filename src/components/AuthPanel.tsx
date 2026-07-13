@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ID } from "appwrite";
+import { account } from "@/lib/appwrite-client";
 
 type Mode = "signin" | "signup";
 
@@ -21,26 +22,34 @@ export function AuthPanel() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const res = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Could not create account");
-        }
+        // 1. Create account in Appwrite
+        await account.create(ID.unique(), email, password, name);
       }
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+
+      // 2. Authenticate the user (create session) in Appwrite
+      // This sets the secure cookies automatically
+      await account.createEmailPasswordSession(email, password);
+
+      // 3. Sync the Appwrite session with Prisma database
+      const syncRes = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-      if (result?.error) throw new Error("Invalid email or password");
+
+      if (!syncRes.ok) {
+        const data = await syncRes.json();
+        throw new Error(data.error || "Could not sync account with database");
+      }
+
+      // 4. Redirect to the dashboard
       router.push("/today");
       router.refresh();
     } catch (err) {
       setError((err as Error).message);
+      // Clean up session if database sync failed so user isn't half-logged in
+      try {
+        await account.deleteSession("current");
+      } catch {}
     } finally {
       setLoading(false);
     }
@@ -103,7 +112,6 @@ export function AuthPanel() {
             id="password"
             type="password"
             required
-            minLength={8}
             className="gm-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

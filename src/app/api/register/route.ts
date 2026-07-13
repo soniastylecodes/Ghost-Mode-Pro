@@ -1,47 +1,63 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { z } from "zod";
+import { createSessionClient } from "@/lib/appwrite";
 import { prisma } from "@/lib/prisma";
-
-const schema = z.object({
-  name: z.string().min(1).max(80).optional(),
-  email: z.string().email(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const parsed = schema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+    // 1. Get the authenticated Appwrite user from the session cookie
+    const { account } = createSessionClient();
+    const appwriteUser = await account.get();
+
+    if (!appwriteUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const email = parsed.data.email.toLowerCase();
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: "An account with this email already exists." },
-        { status: 409 }
-      );
+    const email = appwriteUser.email.toLowerCase();
+    const id = appwriteUser.$id;
+
+    // 2. Check if the user already exists in Prisma by their Appwrite ID
+    const existingById = await prisma.user.findUnique({ where: { id } });
+    if (existingById) {
+      return NextResponse.json({ id: existingById.id, email: existingById.email, role: existingById.role }, { status: 200 });
     }
 
-    const passwordHash = await bcrypt.hash(parsed.data.password, 10);
+    // 3. Check if the user exists in Prisma by email (migration / re-linking case)
+    const existingByEmail = await prisma.user.findUnique({ where: { email } });
+    if (existingByEmail) {
+      if (existingByEmail.id !== id) {
+        try {
+          // Attempt to update the primary key ID to match the new Appwrite ID
+          await prisma.user.update({
+            where: { email },
+            data: { id },
+          });
+        } catch (updateErr) {
+          console.error("Failed to migrate existing user ID to Appwrite ID:", updateErr);
+          return NextResponse.json(
+            { error: "An account with this email already exists in the database under a different login method." },
+            { status: 409 }
+          );
+        }
+      }
+      return NextResponse.json({ id, email, role: existingByEmail.role }, { status: 200 });
+    }
+
+    // 4. Create a new user in Prisma linked to the Appwrite User ID
     const user = await prisma.user.create({
       data: {
+        id,
         email,
-        name: parsed.data.name,
-        passwordHash,
+        name: appwriteUser.name || undefined,
         streak: { create: {} },
       },
     });
 
-    return NextResponse.json({ id: user.id, email: user.email }, { status: 201 });
+    return NextResponse.json({ id: user.id, email: user.email, role: user.role }, { status: 201 });
   } catch (err) {
-    console.error("register error:", err);
-    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
+    console.error("Register sync error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Something went wrong." },
+      { status: 500 }
+    );
   }
 }
