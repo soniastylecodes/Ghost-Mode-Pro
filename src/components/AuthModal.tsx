@@ -77,11 +77,30 @@ export function AuthModal({ isOpen, initialMode = "signup", onClose }: AuthModal
         console.error("Database sync failed:", syncErr);
         // Continue to dashboard anyway since auth succeeded
       }
+
+      // Sync Appwrite fallback cookie to 1st party cookie for Next.js SSR
+      try {
+        const fallback = localStorage.getItem("cookieFallback");
+        if (fallback) {
+          const parsed = JSON.parse(fallback);
+          const cookieName = "a_session_6a55033c0003c8088a1b";
+          if (parsed[cookieName]) {
+            document.cookie = `${cookieName}=${parsed[cookieName]}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+          }
+        }
+      } catch (e) {}
+
       router.push("/today");
       router.refresh();
-    } catch (err) {
-      setError((err as Error).message);
-      try { await account.deleteSession("current"); } catch {}
+    } catch (err: any) {
+      if (err.message?.includes("session is active") || err.code === 401) {
+        // Proceed, session already exists
+      } else {
+        setError(err.message);
+        try { await account.deleteSession("current"); } catch {}
+        setLoading(false);
+        return;
+      }
     } finally {
       setLoading(false);
     }

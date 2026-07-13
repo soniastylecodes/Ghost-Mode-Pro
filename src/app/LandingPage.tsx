@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { AuthModal } from "@/components/AuthModal";
 import { GhostLogo } from "@/components/GhostLogo";
+import { Particles } from "@/components/Particles";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Mode = "signin" | "signup";
 
@@ -22,6 +24,8 @@ export default function LandingPage() {
       <div className="landing-glow-1" />
       <div className="landing-glow-2" />
 
+      <Particles />
+
       {/* ── Navbar ── */}
       <header className="landing-nav">
         <GhostLogo size={32} withWordmark />
@@ -29,6 +33,7 @@ export default function LandingPage() {
         <nav className="landing-nav-links">
           <a href="#features">Features</a>
           <a href="#how">How it works</a>
+          <ThemeToggle />
         </nav>
 
         <div className="landing-nav-cta">
@@ -67,9 +72,9 @@ export default function LandingPage() {
 
         {/* Sub */}
         <p className="landing-sub">
-          One goal. A hidden roadmap. Three missions daily.
+          One mission. One task at a time.
           <br />
-          Nothing counts without proof. No excuses.
+          Nothing counts until you prove it.
         </p>
 
         {/* Single CTA */}
@@ -83,9 +88,9 @@ export default function LandingPage() {
 
         {/* Stat pills */}
         <div className="landing-stats">
-          <div className="landing-stat-pill">🎯 One goal at a time</div>
-          <div className="landing-stat-pill">🤖 AI-verified proof</div>
-          <div className="landing-stat-pill">🔥 Daily streak engine</div>
+          <div className="landing-stat-pill">One goal focus</div>
+          <div className="landing-stat-pill">Verified proof</div>
+          <div className="landing-stat-pill">Execution tracking</div>
         </div>
       </section>
 
@@ -98,15 +103,14 @@ export default function LandingPage() {
 
         <div className="landing-cards-grid">
           {[
-            { icon: "👻", title: "Ghost Mode", desc: "Lock in. No social. No noise. Just you, your goal, and the work." },
-            { icon: "🗺️", title: "Hidden Roadmap", desc: "AI builds your path. You only see today. No overwhelm, no paralysis." },
-            { icon: "📸", title: "Proof of Work", desc: "Submit proof for every task. AI grades it. Fail = not done." },
-            { icon: "🔥", title: "Streak Engine", desc: "Your streak is your identity. Guard it like your life depends on it." },
-            { icon: "💰", title: "Revenue Log", desc: "Track every coin earned. See your hustle turn into income." },
-            { icon: "🧠", title: "Weekly Review", desc: "AI diagnoses your week. Wins, bottlenecks, and the brutal truth." },
+            { title: "Ghost Mode", desc: "Lock in. No social. No noise. Just you, your goal, and the work." },
+            { title: "Hidden Roadmap", desc: "AI builds your path. You only see today. No overwhelm, no paralysis." },
+            { title: "Proof of Work", desc: "Submit proof for every task. AI grades it. Fail = not done." },
+            { title: "Streak Engine", desc: "Your streak is your identity. Guard it like your life depends on it." },
+            { title: "Revenue Log", desc: "Track every coin earned. See your hustle turn into income." },
+            { title: "Weekly Review", desc: "AI diagnoses your week. Wins, bottlenecks, and the brutal truth." },
           ].map((f) => (
             <div key={f.title} className="landing-card">
-              <div className="landing-card-icon">{f.icon}</div>
               <h3 className="landing-card-title">{f.title}</h3>
               <p className="landing-card-desc">{f.desc}</p>
             </div>

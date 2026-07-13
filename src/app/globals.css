@@ -26,6 +26,22 @@
   --color-border:   #1c1c1d;
 }
 
+[data-theme="light"] {
+  --bg:        #f9f9fb;
+  --surface:   #ffffff;
+  --border:    rgba(0,0,0,0.1);
+  --text:      #0a0a0a;
+  --muted:     #52525b;
+
+  --color-void:     #f4f4f5;
+  --color-bone:     #18181b;
+  --color-steel:    #71717a;
+  --color-slate:    #52525b;
+  --color-surface:  #ffffff;
+  --color-surface-2:#fafafa;
+  --color-border:   #e4e4e7;
+}
+
 /* ─── Reset ──────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -142,6 +158,10 @@ html, body {
   backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
+[data-theme="light"] .landing-nav {
+  background: rgba(255,255,255,0.75);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
 
 .landing-nav-links {
   display: none;
@@ -178,7 +198,12 @@ html, body {
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.landing-btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+.landing-btn-ghost:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+[data-theme="light"] .landing-btn-ghost {
+  border-color: rgba(0,0,0,0.15);
+  color: #3f3f46;
+}
+[data-theme="light"] .landing-btn-ghost:hover { border-color: rgba(0,0,0,0.4); color: #000; }
 
 .landing-btn-primary {
   padding: 0.45rem 1.1rem;
@@ -266,7 +291,7 @@ html, body {
   font-weight: 800;
   line-height: 1.06;
   letter-spacing: -0.04em;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 1.5rem;
 }
 .landing-h1-accent {
@@ -303,6 +328,10 @@ html, body {
   color: var(--muted);
   font-weight: 500;
 }
+[data-theme="light"] .landing-stat-pill {
+  border-color: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.02);
+}
 
 /* ─── Features Section ───────────────── */
 .landing-features-section {
@@ -317,7 +346,7 @@ html, body {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 0.75rem;
 }
 .landing-section-sub {
@@ -334,8 +363,8 @@ html, body {
 .landing-card {
   padding: 1.625rem;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  background: var(--surface);
   transition: border-color 0.2s, transform 0.2s;
 }
 .landing-card:hover {
@@ -346,7 +375,7 @@ html, body {
 .landing-card-title {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 0.4rem;
   letter-spacing: -0.01em;
 }
@@ -378,7 +407,7 @@ html, body {
   font-size: clamp(2rem, 5vw, 3.25rem);
   font-weight: 800;
   letter-spacing: -0.035em;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 0.875rem;
 }
 .landing-bottom-sub {
@@ -396,9 +425,9 @@ html, body {
   align-items: center;
   gap: 0.625rem;
   padding: 2rem 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid var(--border);
   font-size: 0.8125rem;
-  color: rgba(255,255,255,0.18);
+  color: var(--muted);
   text-align: center;
 }
 
@@ -415,11 +444,22 @@ html, body {
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.auth-input::placeholder { color: rgba(255,255,255,0.22); }
+.auth-input::placeholder { color: var(--muted); }
 .auth-input:focus {
   border-color: rgba(4,186,99,0.5);
   box-shadow: 0 0 0 3px rgba(4,186,99,0.08);
 }
+[data-theme="light"] .auth-input {
+  background: rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.15);
+  color: #000;
+}
+[data-theme="light"] .auth-modal-card {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 0 80px rgba(4,186,99,0.05);
+}
+[data-theme="light"] .auth-modal-card h2 { color: #000; }
 
 .auth-submit-btn {
   width: 100%;
