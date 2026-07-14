@@ -28,7 +28,7 @@ import type {
 const API_KEY = process.env.ABACUS_API_KEY;
 const BASE_URL =
   process.env.ABACUS_LLM_BASE_URL || "https://routellm.abacus.ai/v1";
-const MODEL = process.env.ABACUS_LLM_MODEL || "route-llm";
+const MODEL = process.env.ABACUS_LLM_MODEL || "deepseek-ai/DeepSeek-V4-Flash";
 
 export const aiEnabled = Boolean(API_KEY);
 
