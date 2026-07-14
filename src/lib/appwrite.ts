@@ -2,8 +2,8 @@ import { Client, Account, Databases } from "node-appwrite";
 import { cookies } from "next/headers";
 
 export function createSessionClient(customCookies?: any) {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "";
+  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "https://fra.cloud.appwrite.io/v1";
+  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "6a55033c0003c8088a1b";
 
   const client = new Client()
     .setEndpoint(endpoint)
@@ -28,8 +28,8 @@ export function createSessionClient(customCookies?: any) {
 }
 
 export function createAdminClient() {
-  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "";
+  const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || "https://fra.cloud.appwrite.io/v1";
+  const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "6a55033c0003c8088a1b";
   const apiKey = process.env.APPWRITE_API_KEY || "";
 
   const client = new Client()
