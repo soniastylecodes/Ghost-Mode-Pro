@@ -341,10 +341,15 @@ html, body {
 .landing-features-section {
   position: relative;
   z-index: 10;
-  padding: 6rem 1.5rem;
+  padding: 4rem 1.5rem;
   max-width: 1080px;
   margin: 0 auto;
   text-align: center;
+}
+@media (min-width: 768px) {
+  .landing-features-section {
+    padding: 7rem 1.5rem;
+  }
 }
 .landing-section-title {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
@@ -356,7 +361,12 @@ html, body {
 .landing-section-sub {
   font-size: 1rem;
   color: var(--muted);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+  .landing-section-sub {
+    margin-bottom: 3rem;
+  }
 }
 .landing-cards-grid {
   display: grid;
@@ -398,8 +408,13 @@ html, body {
   position: relative;
   z-index: 10;
   text-align: center;
-  padding: 7rem 1.5rem;
+  padding: 4rem 1.5rem;
   overflow: hidden;
+}
+@media (min-width: 768px) {
+  .landing-bottom-cta {
+    padding: 7rem 1.5rem;
+  }
 }
 .landing-glow-bottom {
   pointer-events: none;
