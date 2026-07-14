@@ -30,16 +30,33 @@ export async function POST(req: Request, context: { params: { id: string } }) {
     }
     const data = parsed.data;
 
-    await prisma.interviewResponse.create({
-      data: {
-        goalId,
-        income: data.income,
-        skills: data.skills,
-        hoursAvailable: data.hoursAvailable,
-        commitments: data.commitments,
-        distractions: data.distractions,
-      }
+    const existingResponse = await prisma.interviewResponse.findFirst({
+      where: { goalId }
     });
+
+    if (existingResponse) {
+      await prisma.interviewResponse.update({
+        where: { id: existingResponse.id },
+        data: {
+          income: data.income,
+          skills: data.skills,
+          hoursAvailable: data.hoursAvailable,
+          commitments: data.commitments,
+          distractions: data.distractions,
+        }
+      });
+    } else {
+      await prisma.interviewResponse.create({
+        data: {
+          goalId,
+          income: data.income,
+          skills: data.skills,
+          hoursAvailable: data.hoursAvailable,
+          commitments: data.commitments,
+          distractions: data.distractions,
+        }
+      });
+    }
 
     // Generate hidden roadmap
     const roadmap = await generateRoadmap(
@@ -57,14 +74,29 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       }
     );
 
-    await prisma.roadmap.create({
-      data: {
-        goalId: goal.id,
-        phases: roadmap.phases as unknown as object,
-        rawPlan: roadmap.rawPlan,
-        currentPhase: 0,
-      },
+    const existingRoadmap = await prisma.roadmap.findFirst({
+      where: { goalId }
     });
+
+    if (existingRoadmap) {
+      await prisma.roadmap.update({
+        where: { id: existingRoadmap.id },
+        data: {
+          phases: roadmap.phases as unknown as object,
+          rawPlan: roadmap.rawPlan,
+          currentPhase: 0,
+        }
+      });
+    } else {
+      await prisma.roadmap.create({
+        data: {
+          goalId: goal.id,
+          phases: roadmap.phases as unknown as object,
+          rawPlan: roadmap.rawPlan,
+          currentPhase: 0,
+        },
+      });
+    }
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (err) {

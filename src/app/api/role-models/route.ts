@@ -25,8 +25,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(roleModel);
-  } catch (error) {
+  } catch (error: any) {
     console.error("[ROLE_MODELS_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return new NextResponse(error.message || "Internal Error", { status: 500 });
   }
 }

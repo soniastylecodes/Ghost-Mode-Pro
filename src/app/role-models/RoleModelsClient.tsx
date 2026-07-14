@@ -43,7 +43,12 @@ export function RoleModelsClient({ initialRoleModels }: { initialRoleModels: Rol
         setNotes("");
         setImageUrl("");
         router.refresh();
+      } else {
+        const errText = await res.text();
+        alert("Failed to add role model: " + errText);
       }
+    } catch (err: any) {
+      alert("Network error: " + err.message);
     } finally {
       setLoading(false);
     }
