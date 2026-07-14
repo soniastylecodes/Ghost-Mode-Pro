@@ -160,9 +160,22 @@ class CollectionAdapter {
     for (const [key, val] of Object.entries(data)) {
       if (val && typeof val === "object" && !(val instanceof Date)) {
         if ("create" in val) {
-          const relationCollection = key.charAt(0).toUpperCase() + key.slice(1);
-          const relatedDoc = await new CollectionAdapter(relationCollection).create({ data: (val as any).create });
-          data[key] = relatedDoc.id;
+          const relationCollection = key.charAt(0).toUpperCase() + key.slice(1, -1) + (key.endsWith('s') ? '' : 's');
+          // Actually, let's derive collection name by singularizing: primaryTasks -> PrimaryTask
+          const singularKey = key.endsWith('s') ? key.slice(0, -1) : key;
+          const relationCollectionName = singularKey.charAt(0).toUpperCase() + singularKey.slice(1);
+          
+          if (Array.isArray((val as any).create)) {
+            const ids = [];
+            for (const item of (val as any).create) {
+              const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: item });
+              ids.push(relatedDoc.id);
+            }
+            data[key] = ids;
+          } else {
+            const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: (val as any).create });
+            data[key] = relatedDoc.id;
+          }
         } else if ("connect" in val) {
           data[key] = (val as any).connect.id;
         } else {

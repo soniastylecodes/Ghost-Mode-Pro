@@ -115,6 +115,7 @@ export async function POST() {
         goalId: goal.id,
         phaseIndex,
         summary: result.summary,
+        date: startOfToday(),
         deadline: missionDeadline,
         primaryTasks: {
           create: result.primaryMissions.map((t) => ({
