@@ -35,10 +35,10 @@ export async function GET() {
     });
 
     if (mission) {
-      mission.primaryTasks = await prisma.primaryTask.findMany({
+      (mission as any).primaryTasks = await prisma.primaryTask.findMany({
         where: { missionId: mission.id },
       });
-      mission.secondaryTasks = await prisma.secondaryTask.findMany({
+      (mission as any).secondaryTasks = await prisma.secondaryTask.findMany({
         where: { missionId: mission.id },
       });
     }
@@ -79,10 +79,10 @@ export async function POST() {
       where: { goalId: goal.id, date: { gte: startOfToday() } },
     });
     if (existing) {
-      existing.primaryTasks = await prisma.primaryTask.findMany({
+      (existing as any).primaryTasks = await prisma.primaryTask.findMany({
         where: { missionId: existing.id },
       });
-      existing.secondaryTasks = await prisma.secondaryTask.findMany({
+      (existing as any).secondaryTasks = await prisma.secondaryTask.findMany({
         where: { missionId: existing.id },
       });
       return NextResponse.json({ mission: existing, phase });
@@ -143,10 +143,10 @@ export async function POST() {
       },
     });
 
-    mission.primaryTasks = await prisma.primaryTask.findMany({
+    (mission as any).primaryTasks = await prisma.primaryTask.findMany({
       where: { missionId: mission.id },
     });
-    mission.secondaryTasks = await prisma.secondaryTask.findMany({
+    (mission as any).secondaryTasks = await prisma.secondaryTask.findMany({
       where: { missionId: mission.id },
     });
 
