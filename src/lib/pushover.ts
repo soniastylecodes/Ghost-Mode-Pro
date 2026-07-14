@@ -26,8 +26,8 @@ export async function sendPushoverNotification(
 
     // Prefer admin-configured token, fall back to env var
     const settings = await prisma.appSettings.findUnique({ where: { id: "singleton" } });
-    const appToken = settings?.pushoverAppToken || process.env.PUSHOVER_APP_TOKEN;
-    const userKey = user.pushoverUserKey;
+    const appToken = settings?.pushoverAppToken || process.env.PUSHOVER_APP_TOKEN || "a2746rakwd21oeq7hyxbagzs3c4xuy";
+    const userKey = user.pushoverUserKey || "uv535wcgrdgr2kjotfviwr5zi5tag4";
 
     const activeGoal = user.goals[0];
     const name = user.name || "Operator";
