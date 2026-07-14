@@ -193,6 +193,15 @@ class CollectionAdapter {
     return mapPrismaToAppwrite(res);
   }
 
+  async createMany(args: { data: any[] }) {
+    let count = 0;
+    for (const item of args.data) {
+      await this.create({ data: item });
+      count++;
+    }
+    return { count };
+  }
+
   async update(args: { where: any; data: any; select?: any; include?: any }) {
     const db = this.getDB();
     const queries = this.mapWhere(args.where);
