@@ -99,10 +99,10 @@ export async function POST(req: Request, context: { params: { id: string } }) {
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (err) {
-    if ((err as Error).message === "UNAUTHORIZED")
+  } catch (err: any) {
+    if (err.message === "UNAUTHORIZED")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     console.error("Interview error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: err.message || "Server error" }, { status: 500 });
   }
 }
