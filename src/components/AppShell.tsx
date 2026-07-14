@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { account } from "@/lib/appwrite-client";
@@ -35,6 +35,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     router.push("/");
     router.refresh();
   };
+
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      // 15 minutes of inactivity
+      timeoutId = setTimeout(() => {
+        handleSignOut();
+      }, 15 * 60 * 1000);
+    };
+
+    const events = ['mousemove', 'keydown', 'wheel', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+    resetTimer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, []);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-void">
