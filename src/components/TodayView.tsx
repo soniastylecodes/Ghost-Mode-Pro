@@ -61,13 +61,24 @@ export function TodayView() {
     load();
   }, [load]);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function generate() {
     setGenerating(true);
-    const res = await fetch("/api/missions/today", { method: "POST" });
-    const data = await res.json();
-    if (data.mission) setMission(data.mission);
-    if (data.phase) setPhase(data.phase);
-    setGenerating(false);
+    setError(null);
+    try {
+      const res = await fetch("/api/missions/today", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to assign mission");
+      }
+      if (data.mission) setMission(data.mission);
+      if (data.phase) setPhase(data.phase);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function toggleSecondary(taskId: string, currentStatus: "pending" | "complete") {
@@ -185,6 +196,11 @@ export function TodayView() {
           >
             {generating ? "Assigning…" : "Get today’s mission"}
           </button>
+          {error && (
+            <p className="mt-4 text-sm text-red-500 font-semibold bg-red-500/10 p-3 rounded-lg border border-red-500/30">
+              Error: {error}
+            </p>
+          )}
         </div>
       ) : (
         <>

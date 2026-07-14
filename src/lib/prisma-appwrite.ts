@@ -151,6 +151,8 @@ class CollectionAdapter {
   async create(args: { data: any; select?: any; include?: any }) {
     const db = this.getDB();
     const data = { ...args.data };
+    const docId = data.id || ID.unique();
+    delete data.id;
 
     // Map foreign key IDs to relationship names
     if (data.userId !== undefined) { data.user = data.userId; delete data.userId; }
@@ -167,15 +169,18 @@ class CollectionAdapter {
           const singularKey = key.endsWith('s') ? key.slice(0, -1) : key;
           const relationCollectionName = singularKey.charAt(0).toUpperCase() + singularKey.slice(1);
           
+          
+          const parentIdKey = this.collectionId.charAt(0).toLowerCase() + this.collectionId.slice(1) + "Id";
+          
           if (Array.isArray((val as any).create)) {
             const ids = [];
             for (const item of (val as any).create) {
-              const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: item });
+              const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: { ...item, [parentIdKey]: docId } });
               ids.push(relatedDoc.id);
             }
             data[key] = ids;
           } else {
-            const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: (val as any).create });
+            const relatedDoc = await new CollectionAdapter(relationCollectionName).create({ data: { ...(val as any).create, [parentIdKey]: docId } });
             data[key] = relatedDoc.id;
           }
         } else if ("connect" in val) {
@@ -188,8 +193,6 @@ class CollectionAdapter {
       }
     }
 
-    const docId = data.id || ID.unique();
-    delete data.id;
 
     const res = await db.createDocument(databaseId, this.collectionId, docId, data);
     return mapPrismaToAppwrite(res);
