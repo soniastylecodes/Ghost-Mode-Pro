@@ -141,7 +141,6 @@ export async function POST() {
           })),
         },
       },
-      },
     });
 
     mission.primaryTasks = await prisma.primaryTask.findMany({
