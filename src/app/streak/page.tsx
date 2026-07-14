@@ -10,10 +10,26 @@ export default async function StreakPage() {
     include: { streak: true }
   });
 
-  const missions = await prisma.mission.findMany({
-    where: { goal: { userId } },
-    select: { date: true, status: true, primaryTasks: { select: { status: true } } }
-  });
+  const goals = await prisma.goal.findMany({ where: { userId } });
+  const goalIds = goals.map(g => g.id);
+  
+  const missions = goalIds.length > 0 ? await prisma.mission.findMany({
+    where: { goalId: { in: goalIds } },
+  }) : [];
+
+  const missionIds = missions.map(m => m.id);
+  const primaryTasks = missionIds.length > 0 ? await prisma.primaryTask.findMany({
+    where: { missionId: { in: missionIds } },
+  }) : [];
+
+  // Group tasks by missionId
+  const tasksByMission: Record<string, any[]> = {};
+  for (const task of primaryTasks) {
+    if (!tasksByMission[task.missionId]) {
+      tasksByMission[task.missionId] = [];
+    }
+    tasksByMission[task.missionId].push(task);
+  }
 
   const streak = user?.streak;
 
@@ -22,8 +38,10 @@ export default async function StreakPage() {
 
   const missionHistory = missions.map(m => {
     let status = m.status as "completed" | "failed" | "pending" | "partial";
-    if (status === "pending" && m.date < today) {
-      const tasks = (m as any).primaryTasks || [];
+    const missionDate = m.date || new Date(m.createdAt); // Fallback to createdAt if date is missing
+
+    if (status === "pending" && missionDate < today) {
+      const tasks = tasksByMission[m.id] || [];
       const completedCount = tasks.filter((t: any) => t.status === "complete").length;
       if (completedCount > 0) {
         status = "partial";
@@ -32,7 +50,7 @@ export default async function StreakPage() {
       }
     }
     return {
-      date: m.date.toISOString(),
+      date: missionDate.toISOString(),
       status
     };
   });
