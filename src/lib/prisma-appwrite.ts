@@ -1,5 +1,5 @@
 import { Databases, Query, ID } from "node-appwrite";
-import { createAdminClient } from "./appwrite";
+import { createAdminClient, createSessionClient } from "./appwrite";
 
 const databaseId = "ghost_mode";
 
@@ -43,8 +43,12 @@ class CollectionAdapter {
   constructor(private collectionId: string) {}
 
   private getDB() {
-    const admin = createAdminClient();
-    return admin.databases;
+    if (process.env.APPWRITE_API_KEY) {
+      return createAdminClient().databases;
+    }
+    // Fallback: If the API key is missing in production environment variables,
+    // use the user's browser session cookie to authenticate the Appwrite SDK.
+    return createSessionClient().databases;
   }
 
   private mapWhere(where: any): string[] {
