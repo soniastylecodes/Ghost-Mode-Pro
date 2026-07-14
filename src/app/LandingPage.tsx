@@ -5,14 +5,14 @@ import { AuthModal } from "@/components/AuthModal";
 import { GhostLogo } from "@/components/GhostLogo";
 import { Particles } from "@/components/Particles";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 
-const fadeInUp: Variants = {
+const fadeInUp: any = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-const staggerContainer: Variants = {
+const staggerContainer: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
