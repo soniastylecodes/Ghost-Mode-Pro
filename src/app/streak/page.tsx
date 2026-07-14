@@ -12,15 +12,30 @@ export default async function StreakPage() {
 
   const missions = await prisma.mission.findMany({
     where: { goal: { userId } },
-    select: { date: true, status: true }
+    select: { date: true, status: true, primaryTasks: { select: { status: true } } }
   });
 
   const streak = user?.streak;
 
-  const missionHistory = missions.map(m => ({
-    date: m.date.toISOString(),
-    status: m.status as "completed" | "failed" | "pending"
-  }));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const missionHistory = missions.map(m => {
+    let status = m.status as "completed" | "failed" | "pending" | "partial";
+    if (status === "pending" && m.date < today) {
+      const tasks = (m as any).primaryTasks || [];
+      const completedCount = tasks.filter((t: any) => t.status === "complete").length;
+      if (completedCount > 0) {
+        status = "partial";
+      } else {
+        status = "failed";
+      }
+    }
+    return {
+      date: m.date.toISOString(),
+      status
+    };
+  });
 
   return (
     <AppShell>

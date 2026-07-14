@@ -27,6 +27,7 @@ export function RevenueClient() {
   const [source, setSource] = useState("");
   const [currency, setCurrency] = useState("NGN");
   const [originalAmount, setOriginalAmount] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export function RevenueClient() {
     const finalOriginal = isForeign ? Number(originalAmount) : Number(amount);
     const finalAmount = Number(amount);
 
-    if (!finalAmount) return;
+    if (amount === "") return;
 
     setSubmitting(true);
 
@@ -80,7 +81,8 @@ export function RevenueClient() {
           description,
           source,
           currency,
-          originalAmount: isForeign ? finalOriginal : null
+          originalAmount: isForeign ? finalOriginal : null,
+          date
         }),
       });
 
@@ -93,6 +95,7 @@ export function RevenueClient() {
         setSource("");
         setOriginalAmount("");
         setCurrency(baseCurrency);
+        setDate(new Date().toISOString().split("T")[0]);
       }
     } finally {
       setSubmitting(false);
@@ -200,7 +203,7 @@ export function RevenueClient() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
             <div>
               <label className="gm-label">Source / Client</label>
               <input 
@@ -215,6 +218,14 @@ export function RevenueClient() {
                 value={description} onChange={e => setDescription(e.target.value)}
                 className="gm-input h-[42px]" 
                 placeholder="e.g. Milestone 1 payment"
+              />
+            </div>
+            <div>
+              <label className="gm-label">Date</label>
+              <input 
+                type="date"
+                value={date} onChange={e => setDate(e.target.value)}
+                className="gm-input h-[42px]" required 
               />
             </div>
           </div>

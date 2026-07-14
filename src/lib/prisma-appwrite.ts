@@ -250,6 +250,17 @@ class CollectionAdapter {
     return mapPrismaToAppwrite(doc);
   }
 
+  async deleteMany(args: { where: any }) {
+    const db = this.getDB();
+    const documents = await this.findMany({ where: args.where });
+    let count = 0;
+    for (const doc of documents) {
+      await db.deleteDocument(databaseId, this.collectionId, doc.id);
+      count++;
+    }
+    return { count };
+  }
+
   async count(args?: { where?: any }) {
     const queries = args?.where ? this.mapWhere(args.where) : [];
     const res = await this.getDB().listDocuments(databaseId, this.collectionId, [

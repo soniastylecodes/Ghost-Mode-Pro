@@ -11,7 +11,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 type MissionHistory = {
   date: string;
-  status: "completed" | "failed" | "pending";
+  status: "completed" | "failed" | "pending" | "partial";
 };
 
 export function CalendarGrid({ 
@@ -81,6 +81,9 @@ export function CalendarGrid({
             } else if (status === "failed") {
               bgClass = "bg-red-500/10 border-red-500/30";
               textClass = "text-red-400";
+            } else if (status === "partial") {
+              bgClass = "bg-orange-500/20 border-orange-500/50";
+              textClass = "text-orange-400 font-bold shadow-glow-sm";
             } else if (isToday(day)) {
               bgClass = "bg-surface border-signal";
               textClass = "text-bone font-bold";
