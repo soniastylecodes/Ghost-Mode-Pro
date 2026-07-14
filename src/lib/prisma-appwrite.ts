@@ -32,9 +32,11 @@ function mapPrismaToAppwrite(doc: any) {
     mapped.primaryTaskId = typeof doc.primaryTask === "object" ? doc.primaryTask.$id : doc.primaryTask;
   }
 
-  // Map createdAt / updatedAt datetimes
+  // Map createdAt / updatedAt / deadline datetimes
   if (doc.$createdAt) mapped.createdAt = new Date(doc.$createdAt);
   if (doc.$updatedAt) mapped.updatedAt = new Date(doc.$updatedAt);
+  if (doc.deadline) mapped.deadline = new Date(doc.deadline);
+  if (doc.date) mapped.date = new Date(doc.date);
 
   return mapped;
 }
