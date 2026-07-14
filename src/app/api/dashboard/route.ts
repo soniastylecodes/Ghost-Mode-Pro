@@ -41,12 +41,17 @@ export async function GET() {
       ? (goal.roadmap.currentPhase / Math.max(1, phases)) * 100
       : 0;
 
-    const totalTasks = await prisma.primaryTask.count({
-      where: { mission: { goalId: goal.id } },
+    const missions = await prisma.mission.findMany({
+      where: { goalId: goal.id }
     });
-    const completedTasks = await prisma.primaryTask.count({
-      where: { mission: { goalId: goal.id }, status: "complete" },
-    });
+    const missionIds = missions.map(m => m.id);
+
+    const totalTasks = missionIds.length > 0 ? await prisma.primaryTask.count({
+      where: { missionId: { in: missionIds } },
+    }) : 0;
+    const completedTasks = missionIds.length > 0 ? await prisma.primaryTask.count({
+      where: { missionId: { in: missionIds }, status: "complete" },
+    }) : 0;
     const taskProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
     const missionProgress = Math.min(
@@ -63,19 +68,19 @@ export async function GET() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const totalRecentTasks = await prisma.primaryTask.count({
+    const totalRecentTasks = missionIds.length > 0 ? await prisma.primaryTask.count({
       where: {
-        mission: { goalId: goal.id },
+        missionId: { in: missionIds },
         createdAt: { gte: sevenDaysAgo },
       },
-    });
-    const completedRecentTasks = await prisma.primaryTask.count({
+    }) : 0;
+    const completedRecentTasks = missionIds.length > 0 ? await prisma.primaryTask.count({
       where: {
-        mission: { goalId: goal.id },
+        missionId: { in: missionIds },
         status: "complete",
         createdAt: { gte: sevenDaysAgo },
       },
-    });
+    }) : 0;
 
     const recentCompletionRate = totalRecentTasks > 0 ? (completedRecentTasks / totalRecentTasks) : 1;
     const taskPoints = Math.round(recentCompletionRate * 60);

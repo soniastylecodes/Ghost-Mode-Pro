@@ -79,6 +79,8 @@ class CollectionAdapter {
             queries.push(Query.lessThan(queryKey, formattedVal as any));
           } else if (op === "not") {
             queries.push(Query.notEqual(queryKey, formattedVal as any));
+          } else if (op === "in") {
+            queries.push(Query.equal(queryKey, opVal as any));
           }
         }
       } else {

@@ -32,11 +32,16 @@ export async function GET() {
     const mission = await prisma.mission.findFirst({
       where: { goalId: goal.id, date: { gte: startOfToday() } },
       orderBy: { createdAt: "desc" },
-      include: {
-        primaryTasks: { orderBy: { priority: "asc" }, include: { proofs: true } },
-        secondaryTasks: { orderBy: { createdAt: "asc" } },
-      },
     });
+
+    if (mission) {
+      mission.primaryTasks = await prisma.primaryTask.findMany({
+        where: { missionId: mission.id },
+      });
+      mission.secondaryTasks = await prisma.secondaryTask.findMany({
+        where: { missionId: mission.id },
+      });
+    }
 
     const phaseIndex = mission?.phaseIndex ?? 0;
     const phase = goal.roadmap?.phases ? (goal.roadmap.phases as unknown as RoadmapPhase[])[phaseIndex] : null;
@@ -72,12 +77,16 @@ export async function POST() {
     // Return existing mission if already generated today.
     const existing = await prisma.mission.findFirst({
       where: { goalId: goal.id, date: { gte: startOfToday() } },
-      include: {
-        primaryTasks: { orderBy: { priority: "asc" }, include: { proofs: true } },
-        secondaryTasks: { orderBy: { createdAt: "asc" } },
-      },
     });
-    if (existing) return NextResponse.json({ mission: existing, phase });
+    if (existing) {
+      existing.primaryTasks = await prisma.primaryTask.findMany({
+        where: { missionId: existing.id },
+      });
+      existing.secondaryTasks = await prisma.secondaryTask.findMany({
+        where: { missionId: existing.id },
+      });
+      return NextResponse.json({ mission: existing, phase });
+    }
 
     // Build a short prior-progress summary from completed tasks.
     const completed = await prisma.primaryTask.count({
@@ -132,10 +141,14 @@ export async function POST() {
           })),
         },
       },
-      include: {
-        primaryTasks: { orderBy: { priority: "asc" }, include: { proofs: true } },
-        secondaryTasks: { orderBy: { createdAt: "asc" } },
       },
+    });
+
+    mission.primaryTasks = await prisma.primaryTask.findMany({
+      where: { missionId: mission.id },
+    });
+    mission.secondaryTasks = await prisma.secondaryTask.findMany({
+      where: { missionId: mission.id },
     });
 
     // Schedule escalation path
