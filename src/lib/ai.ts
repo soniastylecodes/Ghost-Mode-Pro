@@ -35,7 +35,27 @@ export const aiEnabled = Boolean(API_KEY);
 // ---------------------------------------------------------------------------
 // Low-level chat call (OpenAI-compatible)
 // ---------------------------------------------------------------------------
-async function chat(system: string, user: string): Promise<string> {
+async function chat(system: string, user: string, imageUrl?: string): Promise<string> {
+  const messages: any[] = [
+    { role: "system", content: system },
+  ];
+
+  if (imageUrl) {
+    messages.push({
+      role: "user",
+      content: [
+        { type: "text", text: user },
+        { type: "image_url", image_url: { url: imageUrl } },
+      ],
+    });
+  } else {
+    messages.push({ role: "user", content: user });
+  }
+
+  // If we are passing an image, we MUST use a vision-capable model.
+  // We use gpt-4o-mini here as a fast, reliable vision fallback.
+  const activeModel = imageUrl ? "gpt-4o-mini" : MODEL;
+
   const res = await fetch(`${BASE_URL}/chat/completions`, {
     method: "POST",
     headers: {
@@ -43,12 +63,9 @@ async function chat(system: string, user: string): Promise<string> {
       Authorization: `Bearer ${API_KEY}`,
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: activeModel,
       temperature: 0.4,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
+      messages,
     }),
   });
 
@@ -202,7 +219,11 @@ Return your verdict.`;
 
   if (aiEnabled) {
     try {
-      const raw = await chat(PROOF_SYSTEM, user);
+      const isImage = proofType === "screenshot" && proofContent.startsWith("http");
+      // If it's a screenshot, just send the URL to the image analyzer, otherwise text.
+      const promptText = isImage ? `TASK OBJECTIVE: ${objective}\nEXPECTED OUTCOME: ${expectedOutcome}\n\nPlease analyze the provided screenshot and return your verdict.` : user;
+      const raw = await chat(PROOF_SYSTEM, promptText, isImage ? proofContent : undefined);
+      
       const parsed = extractJson<ProofVerdict>(raw);
       if (parsed?.verdict) {
         return {
