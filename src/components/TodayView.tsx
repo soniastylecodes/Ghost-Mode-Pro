@@ -172,6 +172,8 @@ export function TodayView() {
   const totalCompleted = completedPrimary + completedSecondary;
   const totalTasks = totalPrimary + totalSecondary;
 
+  const hasEnded = mission?.reflection || (mission && mission.status !== "active" && mission.status !== "pending");
+
   if (loading && !mission) {
     return <p className="text-slate">Loading today’s mission…</p>;
   }
@@ -224,6 +226,20 @@ export function TodayView() {
               )}
             </div>
           )}
+        </div>
+      ) : hasEnded ? (
+        <div className="gm-card text-center py-10 mt-6 animate-fade-in border border-border/50">
+          <div className="text-4xl mb-4">🌙</div>
+          <h2 className="text-2xl font-bold text-bone tracking-tight">Day Complete</h2>
+          <p className="text-slate mt-2 max-w-md mx-auto leading-relaxed text-sm">
+            You have successfully submitted your daily reflection and closed out today's mission. Ghost Mode is recalibrating your trajectory based on your feedback.
+          </p>
+          <div className="mt-8 rounded-xl border border-deep-green/60 bg-deep-green/10 p-4 max-w-sm mx-auto">
+            <p className="text-sm font-semibold text-signal uppercase tracking-wider">
+              Rest is earned.
+            </p>
+            <p className="text-xs text-bone mt-1">Return tomorrow for your next assignment.</p>
+          </div>
         </div>
       ) : (
         <>

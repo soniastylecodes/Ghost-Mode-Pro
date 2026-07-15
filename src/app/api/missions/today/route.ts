@@ -44,6 +44,7 @@ export async function GET() {
     const mission = await prisma.mission.findFirst({
       where: { goalId: goal.id, date: { gte: startOfToday() } },
       orderBy: { createdAt: "desc" },
+      include: { reflection: true }
     });
 
     if (mission) {
@@ -106,6 +107,7 @@ export async function POST() {
     // Return existing mission if already generated today.
     const existing = await prisma.mission.findFirst({
       where: { goalId: goal.id, date: { gte: startOfToday() } },
+      include: { reflection: true }
     });
     if (existing) {
       (existing as any).primaryTasks = await prisma.primaryTask.findMany({

@@ -47,6 +47,19 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       }
     });
 
+    const pTasks = await prisma.primaryTask.findMany({ where: { missionId } });
+    const completed = pTasks.filter(t => t.status === "complete").length;
+    const total = pTasks.length;
+    let newStatus = "failed";
+    if (completed === total && total > 0) newStatus = "completed";
+    else if (completed > 0) newStatus = "partial";
+    else if (total === 0) newStatus = "completed";
+
+    await prisma.mission.update({
+      where: { id: missionId },
+      data: { status: newStatus }
+    });
+
     return NextResponse.json({ reflectionId: reflection.id }, { status: 201 });
   } catch (err) {
     if ((err as Error).message === "UNAUTHORIZED")
