@@ -476,6 +476,18 @@ Respond strictly in JSON format matching this schema:
     userText += `\nFocus Area: Determine their greatest area of excellence.`;
   }
 
-  const raw = await callAbacus(sys, userText);
-  return extractJson<{ principleToLearn: string; notes: string }>(raw);
+  if (aiEnabled) {
+    try {
+      const raw = await chat(sys, userText);
+      return extractJson<{ principleToLearn: string; notes: string }>(raw);
+    } catch (err) {
+      console.error("generateRoleModelAI error, using fallback:", err);
+    }
+  }
+
+  // Fallback if offline or errors out
+  return {
+    principleToLearn: principleInput || "Relentless execution.",
+    notes: `- Focus purely on what you can control.\n- The work itself is the reward.\n- Cut out all non-essential noise.`,
+  };
 }
