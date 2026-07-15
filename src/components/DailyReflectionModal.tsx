@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export function DailyReflectionModal({
   missionId,
@@ -11,6 +12,11 @@ export function DailyReflectionModal({
   onClose: () => void;
   onSubmitted: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [whatGotDone, setWhatGotDone] = useState("");
   const [whatSlowedDown, setWhatSlowedDown] = useState("");
   const [whatDidYouLearn, setWhatDidYouLearn] = useState("");
@@ -47,7 +53,9 @@ export function DailyReflectionModal({
     }
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/80 p-4 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-md rounded-xl border border-border bg-black/90 p-6 shadow-2xl">
         <h2 className="text-xl font-semibold text-bone">End of Day Reflection</h2>
@@ -127,6 +135,7 @@ export function DailyReflectionModal({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

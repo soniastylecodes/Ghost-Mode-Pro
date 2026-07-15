@@ -104,14 +104,28 @@ export async function POST() {
       return NextResponse.json({ mission: existing, phase });
     }
 
-    // Build a short prior-progress summary from completed tasks.
-    const completed = await prisma.primaryTask.count({
-      where: { mission: { goalId: goal.id }, status: "complete" },
+    // Fetch the most recent mission before today to assess yesterday's progress.
+    const lastMission = await prisma.mission.findFirst({
+      where: { goalId: goal.id },
+      orderBy: { date: "desc" },
+      include: { primaryTasks: true }
     });
-    const priorSummary =
-      completed > 0
-        ? `${completed} primary tasks completed so far. Keep advancing the current phase.`
-        : "This is day one.";
+
+    let priorSummary = "";
+    if (lastMission) {
+      const primaryList = lastMission.primaryTasks;
+      const completedPrimary = primaryList.filter(t => t.status === "complete");
+      const missedPrimary = primaryList.filter(t => t.status !== "complete");
+      
+      priorSummary = `Last mission was on ${lastMission.date.toLocaleDateString()}.
+Status: ${lastMission.status}.
+Primary tasks completed: ${completedPrimary.length}/${primaryList.length}.
+${completedPrimary.length > 0 ? `Completed objectives: ${completedPrimary.map(t => `"${t.objective}"`).join(", ")}.` : ""}
+${missedPrimary.length > 0 ? `MISSED objectives that need rollover/re-adaptation: ${missedPrimary.map(t => `"${t.objective}"`).join(", ")}.` : ""}
+Please adjust today's missions accordingly (e.g. carry over/re-adapt missed tasks if crucial, or scale intensity down if they struggled).`;
+    } else {
+      priorSummary = "This is day one. No prior missions.";
+    }
 
     // Fetch Role Models to inject their principles
     const roleModels = await prisma.roleModel.findMany({ where: { userId } });

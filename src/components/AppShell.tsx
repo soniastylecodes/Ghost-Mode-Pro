@@ -36,8 +36,8 @@ const NAV = [
 ];
 
 const MOBILE_NAV = [
-  { href: "/today", label: "Today", icon: Target },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/today", label: "Today", icon: Target },
   { href: "/revenue", label: "Revenue", icon: DollarSign },
   { href: "/streak", label: "Streak", icon: CalendarDays },
   { href: "#more", label: "More", icon: Sliders },
@@ -59,6 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [greeting, setGreeting] = useState("Welcome");
   const [formattedDate, setFormattedDate] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
   
   const handleSignOut = async () => {
     try {
@@ -80,6 +81,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         console.error("Failed to load user info:", err);
       });
   }, []);
+
+  useEffect(() => {
+    const updateTime = () => {
+      setCurrentTime(
+        new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 10000); // Update clock every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Prefetch all key pages client-side for near-instant page changes
+    router.prefetch("/dashboard");
+    router.prefetch("/today");
+    router.prefetch("/revenue");
+    router.prefetch("/streak");
+    router.prefetch("/jobs");
+    router.prefetch("/leads");
+    router.prefetch("/reviews");
+    router.prefetch("/role-models");
+    router.prefetch("/rest");
+  }, [router]);
 
   useEffect(() => {
     // Calculate time-of-day greeting
@@ -192,18 +221,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p className="text-sm text-slate mt-1">{formattedDate}</p>
             </div>
             
-            {/* User profile capsule */}
-            <div className="flex items-center gap-3 self-start sm:self-auto bg-surface-2 border border-border/50 py-1.5 pl-3 pr-4 rounded-full">
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-semibold text-bone">{user?.name || "Ghost Member"}</span>
-                <span className="text-[10px] text-signal flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
-                  Active Session
-                </span>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-signal/45 to-void border border-signal/60 flex items-center justify-center font-bold text-signal text-xs shadow-glow">
-                {(user?.name || "G").charAt(0).toUpperCase()}
-              </div>
+            {/* Dynamic Premium Clock Badge (replaces active session) */}
+            <div className="flex items-center gap-2 bg-surface-2 border border-border/50 py-1.5 px-4 rounded-full text-slate hover:text-bone hover:border-steel transition-all duration-300 shadow-glow self-start sm:self-auto">
+              <span className="w-2 h-2 rounded-full bg-signal animate-pulse" />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate">Local Time</span>
+              <span className="font-mono text-xs font-bold text-bone">{currentTime || "00:00"}</span>
             </div>
           </div>
 
@@ -224,7 +246,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <button
                   key="more"
                   onClick={() => setMoreDrawerOpen(true)}
-                  className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+                  className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-75 active:duration-75 active:ease-out ${
                     active 
                       ? "bg-bone text-void shadow-lg transform -translate-y-1.5 scale-110" 
                       : "text-slate hover:text-bone"
@@ -240,7 +262,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={n.href}
                 href={n.href}
-                className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+                className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 active:scale-75 active:duration-75 active:ease-out ${
                   active 
                     ? "bg-bone text-void shadow-lg transform -translate-y-1.5 scale-110" 
                     : "text-slate hover:text-bone"

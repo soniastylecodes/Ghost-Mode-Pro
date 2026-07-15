@@ -42,11 +42,17 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   async function fetchDashboard() {
-    const res = await fetch("/api/dashboard");
-    const data = await res.json();
-    setMetrics(data.metrics);
-    setGoal(data.goal);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/dashboard");
+      if (!res.ok) throw new Error("API error: " + res.status);
+      const data = await res.json();
+      setMetrics(data.metrics || null);
+      setGoal(data.goal || null);
+    } catch (err) {
+      console.error("Failed to fetch dashboard metrics:", err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -54,7 +60,7 @@ export function Dashboard() {
   }, []);
 
   async function toggleMilestone(index: number, currentStatus: boolean) {
-    if (!goal || !goal.outcomeThreads) return;
+    if (!goal || !goal.outcomeThreads || !Array.isArray(goal.outcomeThreads)) return;
     
     // Optimistic update
     const newThreads = [...goal.outcomeThreads];
@@ -135,7 +141,7 @@ export function Dashboard() {
         </p>
       </div>
 
-      {goal?.outcomeThreads && goal.outcomeThreads.length > 0 && (
+      {goal?.outcomeThreads && Array.isArray(goal.outcomeThreads) && goal.outcomeThreads.length > 0 && (
         <div className="mt-8 gm-card">
           <p className="mb-4 text-xs uppercase tracking-widest text-steel">
             Key Milestones

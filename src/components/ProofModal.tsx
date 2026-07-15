@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { TaskWithProofs } from "./TaskCard";
 import type { VerdictValue } from "@/lib/types";
 
@@ -13,6 +14,11 @@ export function ProofModal({
   onClose: () => void;
   onResolved: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const isUrl = task.proofTypeRequired === "url";
   const isScreenshot = task.proofTypeRequired === "screenshot";
   const [content, setContent] = useState("");
@@ -71,7 +77,9 @@ export function ProofModal({
       ? "text-yellow-400 border-yellow-700/50"
       : "text-red-400 border-red-800/50";
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/80 p-4 backdrop-blur">
       <div className="gm-card w-full max-w-lg animate-fade-in">
         <div className="flex items-start justify-between">
@@ -164,6 +172,7 @@ export function ProofModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

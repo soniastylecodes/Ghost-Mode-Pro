@@ -37,10 +37,10 @@ export default async function StreakPage() {
   today.setHours(0, 0, 0, 0);
 
   const missionHistory = missions.map(m => {
-    let status = m.status as "completed" | "failed" | "pending" | "partial";
+    let status = m.status as "completed" | "failed" | "pending" | "partial" | "active";
     const missionDate = m.date || new Date(m.createdAt); // Fallback to createdAt if date is missing
 
-    if (status === "pending" && missionDate < today) {
+    if ((status === "active" || status === "pending") && missionDate < today) {
       const tasks = tasksByMission[m.id] || [];
       const completedCount = tasks.filter((t: any) => t.status === "complete").length;
       if (completedCount > 0) {
@@ -51,7 +51,7 @@ export default async function StreakPage() {
     }
     return {
       date: missionDate.toISOString(),
-      status
+      status: status === "active" ? "pending" : status
     };
   });
 

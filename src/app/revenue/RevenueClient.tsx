@@ -231,23 +231,23 @@ export function RevenueClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-border/20 pb-4 animate-fade-in">
         <div>
-          <h1 className="text-3xl font-semibold text-bone flex items-center gap-4">
-            Revenue Tracker
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-bold text-bone">Revenue Tracker</h1>
             <select 
               value={baseCurrency}
               onChange={(e) => updateBaseCurrency(e.target.value)}
-              className="text-sm bg-surface text-bone px-2 py-1 rounded border border-border outline-none focus:border-signal"
+              className="text-xs bg-surface-2 text-slate hover:text-bone hover:border-steel px-2 py-1 rounded-full border border-border outline-none focus:border-signal transition-all cursor-pointer"
             >
               {CURRENCIES.map(c => <option key={c} value={c}>Base: {c}</option>)}
             </select>
-          </h1>
-          <p className="text-slate mt-2">Log wins. Chase the target.</p>
+          </div>
+          <p className="text-xs sm:text-sm text-slate mt-1">Log wins. Chase the target.</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="gm-btn-primary py-2 text-sm"
+          className="gm-btn-primary rounded-full px-5 py-2 text-xs font-bold self-start sm:self-auto active:scale-95 transition-transform"
         >
           {isAdding ? "Cancel" : "Log Revenue"}
         </button>
@@ -343,13 +343,20 @@ export function RevenueClient() {
                 else if (baseCurrency === "EUR") currencyBadge = "€";
                 else if (baseCurrency === "GBP") currencyBadge = "£";
 
+                let tier = { border: "border-emerald-500/20", text: "text-emerald-400", bg: "bg-emerald-500/5" };
+                if (log.amount === 0) tier = { border: "border-red-500/35", text: "text-red-400", bg: "bg-red-500/5" };
+                else if (log.amount >= 10000 && log.amount < 100000) tier = { border: "border-cyan-500/20", text: "text-cyan-400", bg: "bg-cyan-500/5" };
+                else if (log.amount >= 100000 && log.amount < 200000) tier = { border: "border-purple-500/30", text: "text-purple-400", bg: "bg-purple-500/5" };
+                else if (log.amount >= 200000 && log.amount < 500000) tier = { border: "border-amber-500/40", text: "text-amber-400", bg: "bg-amber-500/5" };
+                else if (log.amount >= 500000) tier = { border: "border-yellow-400/40 shadow-[0_0_10px_rgba(250,204,21,0.05)]", text: "text-yellow-400", bg: "bg-yellow-400/5" };
+
                 return (
                   <div 
                     key={log.id} 
-                    className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border/40 hover:border-steel/30 transition-all duration-200"
+                    className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${tier.border} ${tier.bg}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-signal/10 border border-signal/20 flex items-center justify-center font-bold text-signal text-sm shadow-inner flex-shrink-0">
+                      <div className={`w-10 h-10 rounded-full border flex items-center justify-center font-bold text-sm shadow-inner flex-shrink-0 bg-black/40 ${tier.border} ${tier.text}`}>
                         {currencyBadge}
                       </div>
                       <div className="min-w-0">
@@ -364,8 +371,8 @@ export function RevenueClient() {
 
                     <div className="flex items-center gap-2 flex-shrink-0 pl-2">
                       <div className="text-right">
-                        <p className="text-sm font-bold text-signal tracking-tight">
-                          +{baseCurrency} {log.amount.toLocaleString()}
+                        <p className={`text-sm font-bold tracking-tight ${tier.text}`}>
+                          {log.amount > 0 ? "+" : ""}{baseCurrency} {log.amount.toLocaleString()}
                         </p>
                         {isForeign && (
                           <p className="text-[10px] text-slate mt-0.5">
