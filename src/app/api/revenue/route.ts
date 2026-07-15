@@ -69,6 +69,7 @@ export async function PATCH(req: Request) {
     const userId = await getCurrentUserId();
     if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
+    const body = await req.json();
     const { baseCurrency, targetNumber } = body;
 
     if (baseCurrency) {
