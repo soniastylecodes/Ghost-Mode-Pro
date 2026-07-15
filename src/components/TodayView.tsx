@@ -140,7 +140,8 @@ export function TodayView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           missionId: mission.id,
-          type: taskType,
+          type: taskType.startsWith("primary") ? "primary" : "secondary",
+          proofTypeRequired: taskType === "primary_screenshot" ? "screenshot" : taskType === "primary_url" ? "url" : "text",
           objective: newTaskObjective,
           estDuration: Number(newTaskDuration),
           expectedOutcome: newTaskOutcome,
@@ -334,15 +335,17 @@ export function TodayView() {
                       <label className="text-xs text-steel mb-1.5 block">Task Type</label>
                       <select 
                         value={taskType}
-                        onChange={(e) => setTaskType(e.target.value as "primary" | "secondary")}
+                        onChange={(e) => setTaskType(e.target.value as any)}
                         className="gm-input w-full"
                       >
-                        <option value="primary">Primary (Requires Proof)</option>
+                        <option value="primary">Primary (Text Proof)</option>
+                        <option value="primary_screenshot">Primary (Screenshot Proof)</option>
+                        <option value="primary_url">Primary (URL Proof)</option>
                         <option value="secondary">Secondary (Checkbox)</option>
                       </select>
                     </div>
 
-                    {taskType === "primary" && (
+                    {taskType.startsWith("primary") && (
                       <div>
                         <label className="text-xs text-steel mb-1.5 block">Est. Duration (min)</label>
                         <input 

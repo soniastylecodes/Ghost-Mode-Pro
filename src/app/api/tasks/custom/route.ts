@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { missionId, objective, type, estDuration, expectedOutcome } = await req.json();
+    const { missionId, objective, type, estDuration, expectedOutcome, proofTypeRequired } = await req.json();
 
     if (!missionId || !objective || !type) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
           priority: existingPrimaryCount + 1,
           estDuration: Number(estDuration) || 60,
           expectedOutcome: expectedOutcome || "A verifiable outcome",
-          proofTypeRequired: "text", // allow extending this later
+          proofTypeRequired: proofTypeRequired || "text",
         },
       });
       return NextResponse.json({ success: true, task: primaryTask });
