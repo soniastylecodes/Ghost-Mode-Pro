@@ -47,9 +47,13 @@ export async function GET() {
     });
 
     if (mission) {
-      (mission as any).primaryTasks = await prisma.primaryTask.findMany({
+      const pTasks = await prisma.primaryTask.findMany({
         where: { missionId: mission.id },
       });
+      for (const pt of pTasks) {
+        (pt as any).proofs = await prisma.proof.findMany({ where: { primaryTaskId: pt.id } });
+      }
+      (mission as any).primaryTasks = pTasks;
       (mission as any).secondaryTasks = await prisma.secondaryTask.findMany({
         where: { missionId: mission.id },
       });
@@ -155,9 +159,13 @@ export async function POST() {
       },
     });
 
-    (mission as any).primaryTasks = await prisma.primaryTask.findMany({
+    const pTasks = await prisma.primaryTask.findMany({
       where: { missionId: mission.id },
     });
+    for (const pt of pTasks) {
+      (pt as any).proofs = await prisma.proof.findMany({ where: { primaryTaskId: pt.id } });
+    }
+    (mission as any).primaryTasks = pTasks;
     (mission as any).secondaryTasks = await prisma.secondaryTask.findMany({
       where: { missionId: mission.id },
     });
