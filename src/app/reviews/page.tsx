@@ -21,11 +21,22 @@ export default async function ReviewsPage() {
     );
   }
 
-  const missions = await prisma.mission.findMany({
-    where: { goalId: goal.id, reflection: { isNot: null } },
-    include: { reflection: true },
+  // Appwrite's CollectionAdapter doesn't support 'isNot' operator on relations, 
+  // so we fetch all missions and filter them manually.
+  const allMissions = await prisma.mission.findMany({
+    where: { goalId: goal.id },
     orderBy: { date: "desc" }
   });
+
+  const missions = [];
+  for (const m of allMissions) {
+    if (m.reflection) {
+      if (typeof m.reflection === "string") {
+        m.reflection = await prisma.reflection.findUnique({ where: { id: m.reflection } });
+      }
+      missions.push(m);
+    }
+  }
 
   const weeklyReviews = await prisma.weeklyReview.findMany({
     where: { goalId: goal.id },
