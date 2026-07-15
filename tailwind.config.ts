@@ -38,7 +38,7 @@ const config: Config = {
         },
       },
       animation: {
-        "fade-in": "fade-in 0.4s ease-out",
+        "fade-in": "fade-in 0.4s ease-out both",
         "pulse-glow": "pulse-glow 2.4s ease-in-out infinite",
       },
     },

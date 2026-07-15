@@ -7,18 +7,30 @@ import { account } from "@/lib/appwrite-client";
 import { GhostLogo } from "./GhostLogo";
 import { ThemeToggle } from "./ThemeToggle";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { 
+  Menu, 
+  X, 
+  LayoutDashboard, 
+  Target, 
+  CalendarDays, 
+  Briefcase, 
+  Users, 
+  DollarSign, 
+  CheckSquare, 
+  Trophy, 
+  Coffee 
+} from "lucide-react";
 
 const NAV = [
-  { href: "/today", label: "Today's Mission" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/streak", label: "Streak Calendar" },
-  { href: "/role-models", label: "Role Models" },
-  { href: "/leads", label: "Leads" },
-  { href: "/weekly-review", label: "Weekly Review" },
-  { href: "/revenue", label: "Revenue Tracker" },
-  { href: "/rest", label: "Rest Schedule" },
-  { href: "/jobs", label: "Job Board" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/today", label: "Today's Mission", icon: Target },
+  { href: "/streak", label: "Streak Calendar", icon: CalendarDays },
+  { href: "/jobs", label: "Job Board", icon: Briefcase },
+  { href: "/leads", label: "Leads", icon: Users },
+  { href: "/revenue", label: "Revenue Tracker", icon: DollarSign },
+  { href: "/weekly-review", label: "Weekly Review", icon: CheckSquare },
+  { href: "/role-models", label: "Role Models", icon: Trophy },
+  { href: "/rest", label: "Rest Schedule", icon: Coffee },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -35,7 +47,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     router.push("/");
     router.refresh();
   };
-
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -84,20 +95,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <GhostLogo size={32} withWordmark />
           </Link>
         </div>
-        <nav className="flex-1 flex flex-col gap-2 px-4 py-4 overflow-y-auto">
-          {NAV.map((n) => {
+        <nav className="flex-1 flex flex-col gap-1 px-4 py-4 overflow-y-auto">
+          {NAV.map((n, idx) => {
             const active = pathname === n.href;
+            const Icon = n.icon;
             return (
               <Link
                 key={n.href}
                 href={n.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors flex items-center ${
+                style={{ animationDelay: `${idx * 40}ms` }}
+                className={`group rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 flex items-center gap-3 animate-fade-in ${
                   active
                     ? "bg-surface text-signal shadow-glow"
-                    : "text-slate hover:text-bone hover:bg-surface"
+                    : "text-slate hover:text-bone hover:bg-surface hover:translate-x-1"
                 }`}
               >
+                <Icon size={18} className={`transition-transform duration-300 ${active ? "scale-110" : "group-hover:scale-110"}`} />
                 {n.label}
               </Link>
             );
