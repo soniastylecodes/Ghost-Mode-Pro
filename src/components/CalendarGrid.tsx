@@ -33,9 +33,9 @@ export function CalendarGrid({
   const paddingDays = Array.from({ length: startDayOfWeek }).map((_, i) => i);
 
   return (
-    <div className="space-y-8">
-      {/* Top Stats */}
-      <div className="gm-card grid grid-cols-2 gap-4">
+    <div className="sm:space-y-8 space-y-4">
+      {/* Top Stats - Desktop Only */}
+      <div className="hidden md:grid gm-card grid-cols-2 gap-4">
         <div>
           <span className="text-steel uppercase text-sm font-semibold tracking-wider block mb-1">Current Streak</span>
           <span className="text-signal text-5xl font-bold flex items-center gap-2">
@@ -49,8 +49,22 @@ export function CalendarGrid({
       </div>
 
       {/* Calendar */}
-      <div className="gm-card">
-        <h2 className="text-xl font-semibold text-bone mb-6 text-center">
+      <div className="gm-card p-4 sm:p-6">
+        {/* Compact Stats for Mobile view to prevent scroll */}
+        <div className="md:hidden flex justify-between items-center border-b border-border/40 pb-3 mb-4">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-steel uppercase font-bold tracking-wider">Current Streak:</span>
+            <span className="text-signal font-bold text-sm flex items-center gap-1">
+              {currentStreak} <span className="text-xs">🔥</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-steel uppercase font-bold tracking-wider">Longest:</span>
+            <span className="text-bone font-bold text-sm">{longestStreak}</span>
+          </div>
+        </div>
+
+        <h2 className="text-lg sm:text-xl font-semibold text-bone mb-4 sm:mb-6 text-center">
           {format(today, "MMMM yyyy")}
         </h2>
         

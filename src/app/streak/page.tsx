@@ -57,8 +57,8 @@ export default async function StreakPage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div>
+      <div className="max-w-2xl mx-auto sm:space-y-6 space-y-3">
+        <div className="hidden sm:block">
           <h1 className="text-3xl font-semibold text-bone">Streak Calendar</h1>
           <p className="text-slate mt-2">Don&apos;t break the chain.</p>
         </div>

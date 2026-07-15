@@ -45,15 +45,68 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
+    const logDate = date ? new Date(date) : new Date();
+
+    // Check if an existing log exists for the same calendar date and same currency
+    const startOfDay = new Date(logDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(logDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const logCurrency = currency || "NGN";
+
+    const existingLog = await prisma.revenueLog.findFirst({
+      where: {
+        userId,
+        currency: logCurrency,
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    });
+
+    if (existingLog) {
+      // Top up the existing record
+      const parsedAmount = parseFloat(amount);
+      const parsedOriginal = originalAmount ? parseFloat(originalAmount) : null;
+      
+      const newAmount = existingLog.amount + parsedAmount;
+      const newOriginalAmount = existingLog.originalAmount !== null || parsedOriginal !== null
+        ? (existingLog.originalAmount ?? 0) + (parsedOriginal ?? parsedAmount)
+        : null;
+
+      const newDescription = existingLog.description.includes(description)
+        ? existingLog.description
+        : `${existingLog.description}, ${description}`;
+
+      const newSource = source && existingLog.source && !existingLog.source.includes(source)
+        ? `${existingLog.source}, ${source}`
+        : (source || existingLog.source || null);
+
+      const updatedLog = await prisma.revenueLog.update({
+        where: { id: existingLog.id },
+        data: {
+          amount: newAmount,
+          originalAmount: newOriginalAmount,
+          description: newDescription,
+          source: newSource,
+        },
+      });
+
+      return NextResponse.json(updatedLog);
+    }
+
+    // Create a new record if it's the first log on this date for this currency
     const log = await prisma.revenueLog.create({
       data: {
         userId,
         amount: parseFloat(amount),
         description,
         source: source || null,
-        currency: currency || "NGN",
+        currency: logCurrency,
         originalAmount: originalAmount ? parseFloat(originalAmount) : null,
-        date: date ? new Date(date) : new Date(),
+        date: logDate,
       },
     });
 

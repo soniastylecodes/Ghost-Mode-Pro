@@ -155,14 +155,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-void relative">
       {/* Mobile Sticky Top Header */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-surface-2/80 backdrop-blur-md sticky top-0 z-30">
+      <div className="md:hidden flex items-center justify-between p-3 border-b border-border bg-surface-2/80 backdrop-blur-md sticky top-0 z-30 h-14">
         <Link href="/today" className="flex items-center">
-          <GhostLogo size={24} withWordmark />
+          <GhostLogo size={22} withWordmark />
         </Link>
-        <div className="flex items-center gap-1">
+        
+        {/* Compact mobile live clock */}
+        <div className="flex items-center gap-1.5 bg-black/45 border border-border/60 py-1 px-3 rounded-full text-slate font-mono text-[11px] font-bold shadow-glow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
+          <span className="text-bone">{currentTime || "00:00"}</span>
+        </div>
+
+        <div className="flex items-center gap-0.5">
           <ThemeToggle />
           <button onClick={handleSignOut} className="p-2 text-slate hover:text-bone" title="Sign out">
-            <LogOut size={18} />
+            <LogOut size={16} />
           </button>
         </div>
       </div>
@@ -213,16 +220,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8 py-6 md:py-10">
           
           {/* Unified Premium Greeting Header */}
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-6 animate-fade-in">
+          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-border/40 pb-4 sm:pb-6 animate-fade-in">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-bone tracking-tight flex items-center gap-2">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-bone tracking-tight flex items-center gap-2">
                 {greeting}
               </h1>
-              <p className="text-sm text-slate mt-1">{formattedDate}</p>
+              <p className="text-xs sm:text-sm text-slate mt-0.5 sm:mt-1">{formattedDate}</p>
             </div>
             
-            {/* Dynamic Premium Clock Badge (replaces active session) */}
-            <div className="flex items-center gap-2 bg-surface-2 border border-border/50 py-1.5 px-4 rounded-full text-slate hover:text-bone hover:border-steel transition-all duration-300 shadow-glow self-start sm:self-auto">
+            {/* Dynamic Premium Clock Badge (replaces active session) - Desktop only */}
+            <div className="hidden sm:flex items-center gap-2 bg-surface-2 border border-border/50 py-1.5 px-4 rounded-full text-slate hover:text-bone hover:border-steel transition-all duration-300 shadow-glow">
               <span className="w-2 h-2 rounded-full bg-signal animate-pulse" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-slate">Local Time</span>
               <span className="font-mono text-xs font-bold text-bone">{currentTime || "00:00"}</span>
