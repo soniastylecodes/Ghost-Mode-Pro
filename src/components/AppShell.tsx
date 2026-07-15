@@ -219,8 +219,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 min-h-[calc(100vh-65px)] md:h-screen overflow-y-auto pb-safe md:pb-10 momentum-scroll">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8 py-6 md:py-10">
           
-          {/* Unified Premium Greeting Header */}
-          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-border/40 pb-4 sm:pb-6 animate-fade-in">
+          {/* Unified Premium Greeting Header - Hidden on mobile to save space since time is in the sticky nav */}
+          <div className="hidden sm:flex mb-4 sm:mb-8 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-border/40 pb-4 sm:pb-6 animate-fade-in">
             <div>
               <h1 className="text-xl sm:text-3xl font-extrabold text-bone tracking-tight flex items-center gap-2">
                 {greeting}

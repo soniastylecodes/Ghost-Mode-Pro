@@ -181,7 +181,13 @@ export function RevenueClient({
 
       if (res.ok) {
         const newLog = await res.json();
-        setLogs([newLog, ...logs]);
+        setLogs(prev => {
+          const existing = prev.find(l => l.id === newLog.id);
+          if (existing) {
+            return prev.map(l => l.id === newLog.id ? newLog : l);
+          }
+          return [newLog, ...prev];
+        });
         setIsAdding(false);
         setAmount("");
         setDescription("");
