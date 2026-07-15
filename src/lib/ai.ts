@@ -456,3 +456,26 @@ export async function generateMissedDayResponse(
     message: "Yesterday didn't happen the way you planned. That's fine. What happened?",
   };
 }
+
+// ===========================================================================
+// 5. Role Model Generation
+// ===========================================================================
+export async function generateRoleModelAI(name: string, principleInput?: string) {
+  const sys = `You are a peak-performance psychology expert profiling a high achiever. 
+Analyze the provided name and output a concise, intense principle they embody, along with deep, actionable notes.
+Respond strictly in JSON format matching this schema:
+{
+  "principleToLearn": "Core overarching philosophy (1 sentence)",
+  "notes": "Detailed frameworks, quotes, and mindsets to adopt. Use bullet points."
+}`;
+
+  let userText = `Role Model: ${name}`;
+  if (principleInput && principleInput.trim().length > 0) {
+    userText += `\nFocus Area: ${principleInput}`;
+  } else {
+    userText += `\nFocus Area: Determine their greatest area of excellence.`;
+  }
+
+  const raw = await callAbacus(sys, userText);
+  return extractJson<{ principleToLearn: string; notes: string }>(raw);
+}
