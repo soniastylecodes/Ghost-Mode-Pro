@@ -38,6 +38,7 @@ model User {
   roleModels RoleModel[]
   leads      Lead[]
   revenueLogs RevenueLog[]
+  jobs       Job[]
 }
 
 // NextAuth adapter models
@@ -376,6 +377,27 @@ model RevenueLog {
   currency       String   @default("NGN")
   originalAmount Float?
   date           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Job — Remote Job Board / n8n Webhook Target
+// ---------------------------------------------------------------------------
+model Job {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  company   String
+  link      String?
+  salary    String?
+  source    String?
+  status    String   @default("new") // new, applied, interviewing, rejected, offered
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

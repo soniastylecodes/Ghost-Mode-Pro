@@ -18,7 +18,7 @@ const NAV = [
   { href: "/weekly-review", label: "Weekly Review" },
   { href: "/revenue", label: "Revenue Tracker" },
   { href: "/rest", label: "Rest Schedule" },
-  { href: "/filter", label: "Decision Filter" },
+  { href: "/jobs", label: "Job Board" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

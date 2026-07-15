@@ -197,9 +197,22 @@ export function TodayView() {
             {generating ? "Assigning…" : "Get today’s mission"}
           </button>
           {error && (
-            <p className="mt-4 text-sm text-red-500 font-semibold bg-red-500/10 p-3 rounded-lg border border-red-500/30">
-              Error: {error}
-            </p>
+            <div className="mt-4 flex flex-col items-center gap-3">
+              <p className="text-sm text-red-500 font-semibold bg-red-500/10 p-3 rounded-lg border border-red-500/30">
+                Error: {error}
+              </p>
+              {error.includes("No active goal with a roadmap") && (
+                <button
+                  onClick={async () => {
+                    await fetch("/api/goals/archive", { method: "POST" });
+                    window.location.href = "/goal";
+                  }}
+                  className="gm-btn-ghost text-sm"
+                >
+                  Start a New Goal
+                </button>
+              )}
+            </div>
           )}
         </div>
       ) : (

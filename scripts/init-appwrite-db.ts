@@ -123,6 +123,7 @@ async function main() {
     { id: "RoleModel", name: "RoleModel" },
     { id: "Lead", name: "Lead" },
     { id: "RevenueLog", name: "RevenueLog" },
+    { id: "Job", name: "Job" },
   ];
 
   for (const col of collections) {
@@ -133,6 +134,21 @@ async function main() {
   console.log("\nCreating attributes...");
 
   const attributeOperations = [
+    // --- Job ---
+    async () => {
+      const keys = ["userId", "title", "company", "link", "salary", "source", "status", "notes"];
+      try {
+        await databases.createStringAttribute(databaseId, "Job", "userId", 100, true);
+        await databases.createStringAttribute(databaseId, "Job", "title", 255, true);
+        await databases.createStringAttribute(databaseId, "Job", "company", 255, true);
+        await databases.createStringAttribute(databaseId, "Job", "link", 2000, false);
+        await databases.createStringAttribute(databaseId, "Job", "salary", 255, false);
+        await databases.createStringAttribute(databaseId, "Job", "source", 255, false);
+        await databases.createStringAttribute(databaseId, "Job", "status", 50, false, "new");
+        await databases.createStringAttribute(databaseId, "Job", "notes", 4096, false);
+        await waitForAttributes("Job", keys);
+      } catch (err: any) { if (err.code !== 409) throw err; }
+    },
     // --- User ---
     async () => {
       const keys = ["email", "name", "pushoverUserKey", "role", "notificationPreferences", "wakeTime", "sleepTime", "napWindows", "pushoverApiToken", "baseCurrency"];
