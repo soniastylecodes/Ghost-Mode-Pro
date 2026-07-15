@@ -9,7 +9,11 @@ const vowSchema = z.object({
   targetNumber: z.number().optional(),
   deadline: z.string().min(1),
   definitionOfSuccess: z.string().min(1),
-  outcomeThreads: z.array(z.string()).optional(),
+  outcomeThreads: z.array(z.object({
+    title: z.string(),
+    deadline: z.string(),
+    completed: z.boolean()
+  })).optional(),
 });
 
 export async function POST(req: Request) {

@@ -7,6 +7,7 @@ interface GoalLite {
   id: string;
   title: string;
   deadline: string;
+  outcomeThreads?: { title: string; deadline: string; completed: boolean }[];
 }
 
 function MetricCard({
@@ -40,15 +41,39 @@ export function Dashboard() {
   const [goal, setGoal] = useState<GoalLite | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function fetchDashboard() {
+    const res = await fetch("/api/dashboard");
+    const data = await res.json();
+    setMetrics(data.metrics);
+    setGoal(data.goal);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    (async () => {
-      const res = await fetch("/api/dashboard");
-      const data = await res.json();
-      setMetrics(data.metrics);
-      setGoal(data.goal);
-      setLoading(false);
-    })();
+    fetchDashboard();
   }, []);
+
+  async function toggleMilestone(index: number, currentStatus: boolean) {
+    if (!goal || !goal.outcomeThreads) return;
+    
+    // Optimistic update
+    const newThreads = [...goal.outcomeThreads];
+    newThreads[index].completed = !currentStatus;
+    setGoal({ ...goal, outcomeThreads: newThreads });
+
+    try {
+      await fetch(`/api/goals/${goal.id}/milestones`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ milestones: newThreads })
+      });
+    } catch (err) {
+      console.error("Failed to toggle milestone:", err);
+      // Revert optimistic update
+      newThreads[index].completed = currentStatus;
+      setGoal({ ...goal, outcomeThreads: newThreads });
+    }
+  }
 
   if (loading || !metrics) {
     return <p className="text-slate">Loading progress…</p>;
@@ -109,6 +134,43 @@ export function Dashboard() {
           fully proven. Keep the streak alive.
         </p>
       </div>
+
+      {goal?.outcomeThreads && goal.outcomeThreads.length > 0 && (
+        <div className="mt-8 gm-card">
+          <p className="mb-4 text-xs uppercase tracking-widest text-steel">
+            Key Milestones
+          </p>
+          <div className="space-y-3">
+            {goal.outcomeThreads.map((m, idx) => (
+              <div 
+                key={idx} 
+                className={`flex items-center justify-between rounded-lg border p-4 transition-colors ${m.completed ? 'border-signal/30 bg-signal/5' : 'border-border bg-black/40'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => toggleMilestone(idx, m.completed)}
+                    className={`flex h-6 w-6 items-center justify-center rounded-md border transition-colors ${m.completed ? 'border-signal bg-signal text-black' : 'border-steel hover:border-bone'}`}
+                  >
+                    {m.completed && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                  <p className={`font-medium ${m.completed ? 'text-steel line-through' : 'text-bone'}`}>
+                    {m.title}
+                  </p>
+                </div>
+                {m.deadline && (
+                  <div className="text-xs text-steel">
+                    {new Date(m.deadline).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

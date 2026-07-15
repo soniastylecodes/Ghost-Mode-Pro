@@ -9,7 +9,7 @@ interface FormState {
   targetNumber: string;
   deadline: string;
   definitionOfSuccess: string;
-  outcomeThreads: string;
+  milestones: { title: string; deadline: string; completed: boolean }[];
   
   income: string;
   skills: string;
@@ -24,7 +24,7 @@ const EMPTY: FormState = {
   targetNumber: "",
   deadline: "",
   definitionOfSuccess: "",
-  outcomeThreads: "",
+  milestones: [],
   
   income: "",
   skills: "",
@@ -40,7 +40,7 @@ const VOW_STEPS = [
   { key: "targetNumber", title: "Target Number", prompt: "Target number or metric (Optional)", placeholder: "e.g. 5000", type: "number" },
   { key: "deadline", title: "Deadline", prompt: "When is the deadline?", placeholder: "", type: "date" },
   { key: "definitionOfSuccess", title: "Success", prompt: "What is your definition of done?", placeholder: "e.g. $5k MRR from a launched product with 50 paying users.", type: "textarea" },
-  { key: "outcomeThreads", title: "Outcome Threads", prompt: "Any specific outcome threads? (Comma separated)", placeholder: "e.g. Marketing, Development, Sales", type: "text" },
+  { key: "milestones", title: "Key Milestones", prompt: "Add key milestones with deadlines (Optional)", placeholder: "", type: "milestones" },
 ];
 
 // Interview = Phase 2
@@ -72,8 +72,11 @@ export function GoalInterviewFlow() {
   function stepValid() {
     if (step === reviewStep) return true;
     const s = ALL_STEPS[step];
-    if (s.key === "targetNumber" || s.key === "outcomeThreads") return true; // Optional fields
-    return form[s.key as keyof FormState].trim().length > 0;
+    if (s.key === "targetNumber" || s.key === "milestones") return true; // Optional fields
+    
+    const val = form[s.key as keyof FormState];
+    if (typeof val === "string") return val.trim().length > 0;
+    return true; // milestones is array
   }
 
   async function submitStep() {
@@ -100,7 +103,7 @@ export function GoalInterviewFlow() {
           targetNumber: form.targetNumber ? parseFloat(form.targetNumber) : undefined,
           deadline: new Date(form.deadline).toISOString(),
           definitionOfSuccess: form.definitionOfSuccess,
-          outcomeThreads: form.outcomeThreads ? form.outcomeThreads.split(",").map(t => t.trim()) : undefined,
+          outcomeThreads: form.milestones.length > 0 ? form.milestones : undefined,
         }),
       });
       const data = await res.json();
@@ -172,16 +175,59 @@ export function GoalInterviewFlow() {
               autoFocus
               className="gm-input resize-none"
               placeholder={ALL_STEPS[step].placeholder}
-              value={form[ALL_STEPS[step].key as keyof FormState]}
+              value={form[ALL_STEPS[step].key as keyof FormState] as string}
               onChange={(e) => update(ALL_STEPS[step].key as keyof FormState, e.target.value)}
             />
+          ) : ALL_STEPS[step].type === "milestones" ? (
+            <div className="space-y-4">
+              {form.milestones.map((m, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    type="text"
+                    className="gm-input flex-1"
+                    placeholder="Milestone title"
+                    value={m.title}
+                    onChange={(e) => {
+                      const newM = [...form.milestones];
+                      newM[i].title = e.target.value;
+                      setForm(f => ({ ...f, milestones: newM }));
+                    }}
+                  />
+                  <input
+                    type="date"
+                    className="gm-input w-40"
+                    value={m.deadline}
+                    onChange={(e) => {
+                      const newM = [...form.milestones];
+                      newM[i].deadline = e.target.value;
+                      setForm(f => ({ ...f, milestones: newM }));
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const newM = form.milestones.filter((_, idx) => idx !== i);
+                      setForm(f => ({ ...f, milestones: newM }));
+                    }}
+                    className="gm-btn-ghost !px-3"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => setForm(f => ({ ...f, milestones: [...f.milestones, { title: "", deadline: "", completed: false }] }))}
+                className="text-sm font-semibold text-signal hover:text-signal/80"
+              >
+                + Add Milestone
+              </button>
+            </div>
           ) : (
             <input
               type={ALL_STEPS[step].type}
               autoFocus
               className="gm-input"
               placeholder={ALL_STEPS[step].placeholder}
-              value={form[ALL_STEPS[step].key as keyof FormState]}
+              value={form[ALL_STEPS[step].key as keyof FormState] as string}
               onChange={(e) => update(ALL_STEPS[step].key as keyof FormState, e.target.value)}
             />
           )}

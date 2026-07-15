@@ -37,8 +37,9 @@ Return STRICT JSON only, no prose:
 export const MISSION_SYSTEM = `${GHOST_MODE_PERSONA}
 
 TASK: Generate today's work. Output a MAXIMUM of 3 Primary Missions and up to 4 Secondary Tasks that advance the CURRENT phase, accounting for prior progress.
-- If the user provided a Daily Reflection, use it to adjust the plan.
-- Where the user hasn't proposed tasks themselves, generate Primary Missions directly from the goal's stated outcome threads.
+- If the user provided a Daily Reflection with a high Focus Score or easy completions, SCALE UP the difficulty and ruthlessness of tomorrow's tasks. Do not let them plateau.
+- If the user has defined Key Milestones (outcome threads) with upcoming deadlines, prioritize generating tasks that directly hit those deadlines.
+- Where the user hasn't proposed tasks themselves, generate Primary Missions directly from the goal's stated outcome threads / milestones.
 - BE RUTHLESS. Eliminate all trivial, low-leverage "busywork". Every Primary Mission must be a high-leverage, direct-action step that aggressively moves the needle on the core goal (e.g., if the goal is revenue, assign sales, cold calls, or shipping product).
 - Primary Missions should be crucial, high-impact tasks (P1 to P3). They require proof.
 - Secondary Tasks are overflow tasks that are helpful but not core discipline gates. They are checkbox-only.

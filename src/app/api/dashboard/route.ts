@@ -102,7 +102,7 @@ export async function GET() {
 
     return NextResponse.json({
       metrics,
-      goal: { id: goal.id, title: goal.title, deadline: goal.deadline },
+      goal: { id: goal.id, title: goal.title, deadline: goal.deadline, outcomeThreads: goal.outcomeThreads },
     });
   } catch (err) {
     if ((err as Error).message === "UNAUTHORIZED")

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { TaskCard, type TaskWithProofs } from "./TaskCard";
 import { ProofModal } from "./ProofModal";
 import { FocusScreen } from "./FocusScreen";
+import { DailyReflectionModal } from "./DailyReflectionModal";
 
 interface SecondaryTaskLite {
   id: string;
@@ -46,6 +47,9 @@ export function TodayView() {
   const [newTaskDuration, setNewTaskDuration] = useState("60");
   const [newTaskOutcome, setNewTaskOutcome] = useState("");
   const [isSubmittingTask, setIsSubmittingTask] = useState(false);
+
+  // Reflection State
+  const [showReflection, setShowReflection] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -374,7 +378,6 @@ export function TodayView() {
             </div>
 
           </div>
-
           {completedPrimary === totalPrimary && totalPrimary > 0 && (
             <div className="mt-8 rounded-xl border border-deep-green/60 bg-deep-green/10 p-5 text-center">
               <p className="font-semibold text-signal">
@@ -383,9 +386,39 @@ export function TodayView() {
               <p className="mt-1 text-sm text-slate">
                 Rest is earned. Return tomorrow for the next mission.
               </p>
+              
+              <button 
+                onClick={() => setShowReflection(true)}
+                className="mt-4 gm-btn-primary mx-auto"
+              >
+                Reflect & End Day
+              </button>
+            </div>
+          )}
+
+          {/* Fallback button if they want to reflect early */}
+          {completedPrimary < totalPrimary && totalPrimary > 0 && (
+            <div className="mt-8 text-center">
+              <button 
+                onClick={() => setShowReflection(true)}
+                className="text-xs font-semibold uppercase tracking-wider text-steel hover:text-signal transition-colors"
+              >
+                Reflect & End Day Early
+              </button>
             </div>
           )}
         </>
+      )}
+
+      {showReflection && mission && (
+        <DailyReflectionModal
+          missionId={mission.id}
+          onClose={() => setShowReflection(false)}
+          onSubmitted={async () => {
+            setShowReflection(false);
+            await load();
+          }}
+        />
       )}
 
       {activeTask && (
