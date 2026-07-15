@@ -334,4 +334,5 @@ export const prisma = {
   roleModel: new CollectionAdapter("RoleModel"),
   lead: new CollectionAdapter("Lead"),
   revenueLog: new CollectionAdapter("RevenueLog"),
+  job: new CollectionAdapter("Job"),
 };
