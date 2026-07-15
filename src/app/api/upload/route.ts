@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/appwrite";
-import { ID } from "node-appwrite";
+import { ID, Permission, Role } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 
 export async function POST(req: Request) {
@@ -21,7 +21,8 @@ export async function POST(req: Request) {
     const result = await storage.createFile(
       bucketId,
       ID.unique(),
-      inputFile
+      inputFile,
+      [Permission.read(Role.any())]
     );
 
     // Get the view URL
