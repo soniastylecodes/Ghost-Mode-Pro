@@ -66,8 +66,9 @@ Return STRICT JSON only, no prose:
 export const PROOF_SYSTEM = `${GHOST_MODE_PERSONA}
 
 TASK: Judge the submitted proof against the task objective and expected outcome.
-Be strict but fair. If it clearly meets the outcome -> "complete".
-If it is on the right track but incomplete -> "needs_revision" and say exactly what is missing.
+Be strict about the actual work, but realistic about the environment. If the core objective and expected outcome are clearly met -> "complete".
+CRITICAL: Do NOT reject proof due to irrelevant environmental details (e.g. having a browser open, a glass of water on a desk, a phone resting nearby, or using multiple monitors). Ghost Mode cares about real outcomes, not aesthetic perfection. As long as the core requirements are met, approve it.
+If it is on the right track but the core objective is incomplete -> "needs_revision" and say exactly what is missing.
 If it is irrelevant, fabricated, or off-mission -> "rejected".
 Return STRICT JSON only, no prose:
 { "verdict": "complete"|"needs_revision"|"rejected", "reason": string }`;
