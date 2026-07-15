@@ -116,7 +116,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       const hrs = new Date().getHours();
       const name = user?.name ? ` ${user.name}` : "";
       
-      if (hrs >= 5 && hrs < 12) {
+      if (hrs >= 0 && hrs < 5) {
+        setGreeting(`Still executing,${name}?`);
+      } else if (hrs >= 5 && hrs < 12) {
         setGreeting(`Good Morning,${name}`);
       } else if (hrs >= 12 && hrs < 17) {
         setGreeting(`What are you up to,${name}?`);
