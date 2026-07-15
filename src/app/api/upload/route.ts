@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/appwrite";
-import { ID, InputFile } from "node-appwrite";
+import { ID } from "node-appwrite";
 
 export async function POST(req: Request) {
   try {
@@ -14,14 +14,10 @@ export async function POST(req: Request) {
     const { storage } = createAdminClient();
     const bucketId = "6a55383200216be2dd16";
     
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const inputFile = InputFile.fromBuffer(buffer, file.name || "upload.png");
-    
     const result = await storage.createFile(
       bucketId,
       ID.unique(),
-      inputFile
+      file
     );
 
     // Get the view URL
