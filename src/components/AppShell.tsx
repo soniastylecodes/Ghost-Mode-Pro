@@ -18,7 +18,8 @@ import {
   DollarSign, 
   CheckSquare, 
   Trophy, 
-  Coffee 
+  Coffee,
+  LogOut
 } from "lucide-react";
 
 const NAV = [
@@ -53,10 +54,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     const resetTimer = () => {
       clearTimeout(timeoutId);
-      // 15 minutes of inactivity
+      // 5 minutes of inactivity
       timeoutId = setTimeout(() => {
         handleSignOut();
-      }, 15 * 60 * 1000);
+      }, 5 * 60 * 1000);
     };
 
     const events = ['mousemove', 'keydown', 'wheel', 'touchstart'];
@@ -76,12 +77,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/today" className="flex items-center">
           <GhostLogo size={24} withWordmark />
         </Link>
-        <button 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-slate hover:text-bone"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={handleSignOut} className="p-2 text-slate hover:text-bone" title="Sign out">
+            <LogOut size={20} />
+          </button>
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-slate hover:text-bone"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar Navigation */}

@@ -144,7 +144,7 @@ export function Dashboard() {
             {goal.outcomeThreads.map((m, idx) => (
               <div 
                 key={idx} 
-                className={`flex items-center justify-between rounded-lg border p-4 transition-colors ${m.completed ? 'border-signal/30 bg-signal/5' : 'border-border bg-black/40'}`}
+                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border p-4 gap-3 sm:gap-0 transition-colors ${m.completed ? 'border-signal/30 bg-signal/5' : 'border-border bg-black/40'}`}
               >
                 <div className="flex items-center gap-4">
                   <button 
