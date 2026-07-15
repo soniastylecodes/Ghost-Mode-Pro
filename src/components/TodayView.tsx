@@ -16,6 +16,7 @@ interface Mission {
   id: string;
   summary: string | null;
   status: string;
+  reflection?: { id: string } | null;
   primaryTasks: TaskWithProofs[];
   secondaryTasks: SecondaryTaskLite[];
 }
