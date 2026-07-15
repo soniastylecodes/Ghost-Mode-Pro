@@ -308,33 +308,52 @@ export function RevenueClient() {
             <p className="text-steel italic">No revenue logged yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {logs.map(log => {
               const isForeign = log.originalAmount != null && log.currency !== baseCurrency;
+              
+              let tier = { border: "border-emerald-500/30", text: "text-emerald-400", bg: "bg-emerald-500/5" };
+              if (log.amount === 0) tier = { border: "border-red-500/50", text: "text-red-500", bg: "bg-red-500/10" };
+              else if (log.amount >= 10000 && log.amount < 100000) tier = { border: "border-cyan-500/50", text: "text-cyan-400", bg: "bg-cyan-500/10" };
+              else if (log.amount >= 100000 && log.amount < 500000) tier = { border: "border-purple-500/50", text: "text-purple-400", bg: "bg-purple-500/10" };
+              else if (log.amount >= 500000 && log.amount < 1000000) tier = { border: "border-amber-500/60", text: "text-amber-400", bg: "bg-amber-500/10" };
+              else if (log.amount >= 1000000) tier = { border: "border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.2)]", text: "text-yellow-400", bg: "bg-yellow-400/10" };
+
               return (
-                <div key={log.id} className="gm-card flex items-center justify-between group">
+                <div key={log.id} className={`gm-card relative flex flex-col justify-between group hover:-translate-y-1 transition-transform duration-200 ${tier.border} ${tier.bg}`}>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <p className="text-lg font-semibold text-signal">+ {baseCurrency} {log.amount.toLocaleString()}</p>
+                    <div className="flex flex-col gap-1 mb-3">
+                      <p className={`text-2xl font-bold tracking-tight ${tier.text}`}>
+                        {log.amount > 0 ? "+" : ""} {baseCurrency} {log.amount.toLocaleString()}
+                      </p>
                       {isForeign && (
-                        <span className="text-xs bg-surface-2 text-slate px-2 py-0.5 rounded">
+                        <span className="text-xs bg-surface-2 text-slate px-2 py-1 rounded w-fit">
                           from {log.currency} {log.originalAmount?.toLocaleString()}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      {log.source && <span className="text-xs font-semibold text-bone uppercase tracking-wider">{log.source}</span>}
-                      {log.source && log.description && <span className="text-slate text-xs">•</span>}
-                      <p className="text-slate text-sm">{log.description}</p>
+                    <div className="flex flex-col gap-1">
+                      {log.source ? (
+                        <span className="text-xs font-semibold text-bone uppercase tracking-wider">{log.source}</span>
+                      ) : (
+                        <span className="text-xs font-semibold text-steel uppercase tracking-wider">UNKNOWN</span>
+                      )}
+                      <p className="text-slate text-sm line-clamp-2" title={log.description || "No description"}>
+                        {log.description || "No description"}
+                      </p>
                     </div>
-                    <p className="text-xs text-steel mt-1">{new Date(log.date).toLocaleDateString()}</p>
                   </div>
-                  <button 
-                    onClick={() => handleDelete(log.id)}
-                    className="text-steel opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all p-2"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                    <p className="text-xs text-steel">{new Date(log.date).toLocaleDateString()}</p>
+                    <button 
+                      onClick={() => handleDelete(log.id)}
+                      className="text-steel opacity-0 group-hover:opacity-100 hover:text-red-500 transition-all p-1"
+                      title="Delete log"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               );
             })}
