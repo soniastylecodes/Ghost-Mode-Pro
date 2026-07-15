@@ -238,7 +238,7 @@ export function TodayView({
           <div className="text-4xl mb-4">🌙</div>
           <h2 className="text-2xl font-bold text-bone tracking-tight">Day Complete</h2>
           <p className="text-slate mt-2 max-w-md mx-auto leading-relaxed text-sm">
-            You have successfully submitted your daily reflection and closed out today's mission. Ghost Mode is recalibrating your trajectory based on your feedback.
+            You have successfully submitted your daily reflection and closed out today&apos;s mission. Ghost Mode is recalibrating your trajectory based on your feedback.
           </p>
           <div className="mt-8 rounded-xl border border-deep-green/60 bg-deep-green/10 p-4 max-w-sm mx-auto">
             <p className="text-sm font-semibold text-signal uppercase tracking-wider">
