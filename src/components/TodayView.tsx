@@ -42,7 +42,7 @@ export function TodayView() {
 
   // Custom Task State
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const [taskType, setTaskType] = useState<"primary" | "secondary">("primary");
+  const [taskType, setTaskType] = useState<"primary" | "primary_screenshot" | "primary_url" | "secondary">("primary");
   const [newTaskObjective, setNewTaskObjective] = useState("");
   const [newTaskDuration, setNewTaskDuration] = useState("60");
   const [newTaskOutcome, setNewTaskOutcome] = useState("");
