@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit2, Check } from "lucide-react";
 
 type RevenueLog = {
   id: string;
@@ -29,6 +29,13 @@ export function RevenueClient() {
   const [originalAmount, setOriginalAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Target Editing State
+  const [isEditingTarget, setIsEditingTarget] = useState(false);
+  const [editTargetValue, setEditTargetValue] = useState("");
+  
+  // Animation State
+  const [animatedWidth, setAnimatedWidth] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -59,11 +66,24 @@ export function RevenueClient() {
     });
   };
 
+  const handleUpdateTarget = async () => {
+    const val = parseFloat(editTargetValue);
+    if (isNaN(val) || val < 0) return;
+
+    setTargetNumber(val);
+    setIsEditingTarget(false);
+    
+    await fetch("/api/revenue", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ targetNumber: val }),
+    });
+  };
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description) return;
     
-    // If currency equals baseCurrency, originalAmount IS amount
     const isForeign = currency !== baseCurrency;
     const finalOriginal = isForeign ? Number(originalAmount) : Number(amount);
     const finalAmount = Number(amount);
@@ -110,10 +130,20 @@ export function RevenueClient() {
     } catch (e) {}
   };
 
-  if (loading) return <p className="text-slate">Loading revenue...</p>;
-
   const totalRevenue = logs.reduce((sum, log) => sum + log.amount, 0);
   const progressPercent = targetNumber > 0 ? Math.min((totalRevenue / targetNumber) * 100, 100) : 0;
+
+  // Trigger animation when progressPercent changes
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setAnimatedWidth(progressPercent);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [progressPercent, loading]);
+
+  if (loading) return <p className="text-slate">Loading revenue...</p>;
 
   return (
     <div className="space-y-6">
@@ -140,15 +170,51 @@ export function RevenueClient() {
       </div>
 
       <div className="gm-card">
-        <div className="flex justify-between mb-2">
-          <p className="text-sm font-semibold uppercase text-steel">Progress to Target</p>
-          <p className="text-sm text-bone">{baseCurrency} {totalRevenue.toLocaleString()} / {baseCurrency} {targetNumber.toLocaleString()}</p>
+        <div className="flex justify-between items-end mb-3">
+          <div>
+            <p className="text-sm font-semibold uppercase text-steel flex items-center gap-2">
+              Progress to Target
+              <span className="text-xs font-bold text-signal bg-signal/10 px-2 py-0.5 rounded">
+                {progressPercent.toFixed(1)}%
+              </span>
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xl font-bold text-bone">
+                {baseCurrency} {totalRevenue.toLocaleString()}
+              </span>
+              <span className="text-slate">/</span>
+              {isEditingTarget ? (
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="number"
+                    autoFocus
+                    className="gm-input py-1 px-2 h-8 w-32"
+                    value={editTargetValue}
+                    onChange={(e) => setEditTargetValue(e.target.value)}
+                    placeholder="Enter target..."
+                  />
+                  <button onClick={handleUpdateTarget} className="text-signal hover:text-white p-1">
+                    <Check size={18} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 group cursor-pointer" onClick={() => { setEditTargetValue(targetNumber.toString()); setIsEditingTarget(true); }}>
+                  <span className="text-lg text-slate group-hover:text-bone transition-colors">
+                    {baseCurrency} {targetNumber.toLocaleString()}
+                  </span>
+                  <Edit2 size={14} className="text-steel group-hover:text-signal transition-colors" />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="h-4 w-full bg-surface rounded-full overflow-hidden">
+        <div className="h-6 w-full bg-surface-2 rounded-full overflow-hidden shadow-inner relative border border-border">
           <div 
-            className="h-full bg-signal transition-all duration-1000 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
+            className="h-full bg-signal transition-all duration-[1500ms] ease-out relative"
+            style={{ width: `${animatedWidth}%` }}
+          >
+            <div className="absolute inset-0 bg-white/20" style={{ backgroundImage: 'linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent)', backgroundSize: '1rem 1rem' }} />
+          </div>
         </div>
       </div>
 

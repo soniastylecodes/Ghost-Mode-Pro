@@ -69,17 +69,27 @@ export async function PATCH(req: Request) {
     const userId = await getCurrentUserId();
     if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-    const body = await req.json();
-    const { baseCurrency } = body;
+    const { baseCurrency, targetNumber } = body;
 
-    if (!baseCurrency) {
-      return new NextResponse("Missing baseCurrency", { status: 400 });
+    if (baseCurrency) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { baseCurrency },
+      });
     }
 
-    await prisma.user.update({
-      where: { id: userId },
-      data: { baseCurrency },
-    });
+    if (targetNumber !== undefined) {
+      const activeGoal = await prisma.goal.findFirst({
+        where: { userId, status: "active" },
+        orderBy: { createdAt: "desc" },
+      });
+      if (activeGoal) {
+        await prisma.goal.update({
+          where: { id: activeGoal.id },
+          data: { targetNumber: parseFloat(targetNumber) },
+        });
+      }
+    }
 
     return NextResponse.json({ success: true, baseCurrency });
   } catch (error) {
