@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { AppShell } from "@/components/AppShell";
 import { Briefcase, Link as LinkIcon, Building2, Banknote, Clock, MoreVertical, X, Check } from "lucide-react";
 
 type Job = {
@@ -57,7 +58,8 @@ export default function JobBoard() {
   if (error) return <div className="p-8 text-red-400">{error}</div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8">
+    <AppShell>
+      <div className="max-w-6xl mx-auto p-4 md:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-bone">Job Board</h1>
         <p className="mt-2 text-slate">Automatically aggregated remote jobs from your n8n agent.</p>
@@ -134,5 +136,6 @@ export default function JobBoard() {
         })}
       </div>
     </div>
+    </AppShell>
   );
 }
