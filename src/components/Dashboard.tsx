@@ -36,13 +36,20 @@ function MetricCard({
   );
 }
 
-export function Dashboard() {
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
-  const [goal, setGoal] = useState<GoalLite | null>(null);
-  const [loading, setLoading] = useState(true);
+export function Dashboard({
+  initialMetrics,
+  initialGoal
+}: {
+  initialMetrics: DashboardMetrics;
+  initialGoal: GoalLite;
+}) {
+  const [metrics, setMetrics] = useState<DashboardMetrics>(initialMetrics);
+  const [goal, setGoal] = useState<GoalLite>(initialGoal);
+  const [loading, setLoading] = useState(false);
 
   async function fetchDashboard() {
     try {
+      setLoading(true);
       const res = await fetch("/api/dashboard");
       if (!res.ok) throw new Error("API error: " + res.status);
       const data = await res.json();
@@ -55,9 +62,7 @@ export function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
+  // No longer fetching on mount since initial props are provided by SSR!
 
   async function toggleMilestone(index: number, currentStatus: boolean) {
     if (!goal || !goal.outcomeThreads || !Array.isArray(goal.outcomeThreads)) return;

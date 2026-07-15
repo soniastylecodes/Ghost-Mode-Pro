@@ -31,11 +31,19 @@ interface PhaseLite {
   objective: string;
 }
 
-export function TodayView() {
-  const [mission, setMission] = useState<Mission | null>(null);
-  const [goal, setGoal] = useState<GoalLite | null>(null);
-  const [phase, setPhase] = useState<PhaseLite | null>(null);
-  const [loading, setLoading] = useState(true);
+export function TodayView({
+  initialMission = null,
+  initialGoal = null,
+  initialPhase = null
+}: {
+  initialMission?: Mission | null;
+  initialGoal?: GoalLite | null;
+  initialPhase?: PhaseLite | null;
+} = {}) {
+  const [mission, setMission] = useState<Mission | null>(initialMission);
+  const [goal, setGoal] = useState<GoalLite | null>(initialGoal);
+  const [phase, setPhase] = useState<PhaseLite | null>(initialPhase);
+  const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [activeTask, setActiveTask] = useState<TaskWithProofs | null>(null);
   const [focusTask, setFocusTask] = useState<TaskWithProofs | null>(null);
@@ -66,9 +74,7 @@ export function TodayView() {
     }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // No longer fetching on mount since initial props are provided by SSR!
 
   const [error, setError] = useState<string | null>(null);
 

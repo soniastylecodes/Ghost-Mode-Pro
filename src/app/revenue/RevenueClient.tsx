@@ -15,11 +15,19 @@ type RevenueLog = {
 
 const CURRENCIES = ["NGN", "USD", "EUR", "GBP", "CAD"];
 
-export function RevenueClient() {
-  const [logs, setLogs] = useState<RevenueLog[]>([]);
-  const [targetNumber, setTargetNumber] = useState<number>(0);
-  const [baseCurrency, setBaseCurrency] = useState("NGN");
-  const [loading, setLoading] = useState(true);
+export function RevenueClient({
+  initialLogs = [],
+  initialTarget = 0,
+  initialCurrency = "NGN"
+}: {
+  initialLogs?: RevenueLog[];
+  initialTarget?: number;
+  initialCurrency?: string;
+} = {}) {
+  const [logs, setLogs] = useState<RevenueLog[]>(initialLogs);
+  const [targetNumber, setTargetNumber] = useState<number>(initialTarget);
+  const [baseCurrency, setBaseCurrency] = useState(initialCurrency);
+  const [loading, setLoading] = useState(false);
   
   const [isAdding, setIsAdding] = useState(false);
   const [amount, setAmount] = useState("");
@@ -120,25 +128,6 @@ export function RevenueClient() {
       </button>
     </>
   );
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const res = await fetch("/api/revenue");
-      if (res.ok) {
-        const data = await res.json();
-        setLogs(data.logs);
-        setTargetNumber(data.targetNumber);
-        setBaseCurrency(data.baseCurrency || "NGN");
-        setCurrency(data.baseCurrency || "NGN");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const updateBaseCurrency = async (newCurrency: string) => {
     setBaseCurrency(newCurrency);
