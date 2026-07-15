@@ -14,11 +14,22 @@ function startOfToday(): Date {
 }
 
 async function getActiveGoal(userId: string) {
-  return prisma.goal.findFirst({
+  const goal = await prisma.goal.findFirst({
     where: { userId, status: "active" },
     orderBy: { createdAt: "desc" },
-    include: { roadmap: true, interviewResponse: true },
   });
+
+  if (!goal) return null;
+
+  // Appwrite relation adapter shim: manually fetch relation objects if returned as IDs
+  if (goal.roadmap && typeof goal.roadmap === "string") {
+    goal.roadmap = await prisma.roadmap.findUnique({ where: { id: goal.roadmap as string } });
+  }
+  if (goal.interviewResponse && typeof goal.interviewResponse === "string") {
+    goal.interviewResponse = await prisma.interviewResponse.findUnique({ where: { id: goal.interviewResponse as string } });
+  }
+
+  return goal;
 }
 
 // GET -> today's mission (do not auto-generate; just read).
@@ -70,9 +81,9 @@ export async function POST() {
         { status: 400 }
       );
 
-    const phases = goal.roadmap.phases as unknown as RoadmapPhase[];
-    const phaseIndex = Math.min(goal.roadmap.currentPhase, phases.length - 1);
-    const phase = phases[phaseIndex];
+    const phases = Array.isArray(goal.roadmap.phases) ? goal.roadmap.phases as unknown as RoadmapPhase[] : [];
+    const phaseIndex = Math.max(0, Math.min(goal.roadmap.currentPhase || 0, phases.length > 0 ? phases.length - 1 : 0));
+    const phase = phases[phaseIndex] || { name: "Execution", objective: "Advance towards your goal.", order: 0, milestones: [] };
 
     // Return existing mission if already generated today.
     const existing = await prisma.mission.findFirst({

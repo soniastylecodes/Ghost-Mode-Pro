@@ -13,11 +13,19 @@ export async function POST(req: Request, context: { params: { taskId: string } }
     const taskId = context.params.taskId;
 
     const task = await prisma.primaryTask.findUnique({
-      where: { id: taskId },
-      include: { mission: { include: { goal: true } } }
+      where: { id: taskId }
     });
 
-    if (!task || task.mission.goal.userId !== userId) {
+    if (!task) return NextResponse.json({ error: "Task not found" }, { status: 404 });
+
+    const missionId = typeof task.mission === "string" ? task.mission : task.missionId;
+    const mission = await prisma.mission.findUnique({ where: { id: missionId } });
+    if (!mission) return NextResponse.json({ error: "Task not found" }, { status: 404 });
+
+    const goalId = typeof mission.goal === "string" ? mission.goal : mission.goalId;
+    const goal = await prisma.goal.findUnique({ where: { id: goalId } });
+
+    if (!goal || goal.userId !== userId) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 

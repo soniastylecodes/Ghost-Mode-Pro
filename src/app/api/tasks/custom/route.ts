@@ -17,11 +17,17 @@ export async function POST(req: Request) {
 
     // Verify mission belongs to user
     const mission = await prisma.mission.findUnique({
-      where: { id: missionId },
-      include: { goal: true },
+      where: { id: missionId }
     });
 
-    if (!mission || mission.goal.userId !== userId) {
+    if (!mission) {
+      return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+    }
+
+    const goalId = typeof mission.goal === "string" ? mission.goal : mission.goalId;
+    const goal = await prisma.goal.findUnique({ where: { id: goalId } });
+
+    if (!goal || goal.userId !== userId) {
       return NextResponse.json({ error: "Mission not found" }, { status: 404 });
     }
 

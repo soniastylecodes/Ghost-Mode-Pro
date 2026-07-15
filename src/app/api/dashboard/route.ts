@@ -13,8 +13,11 @@ export async function GET() {
     const goal = await prisma.goal.findFirst({
       where: { userId, status: "active" },
       orderBy: { createdAt: "desc" },
-      include: { roadmap: true },
     });
+
+    if (goal && goal.roadmap && typeof goal.roadmap === "string") {
+      goal.roadmap = await prisma.roadmap.findUnique({ where: { id: goal.roadmap as string } });
+    }
 
     const streak = await prisma.streak.findUnique({ where: { userId } });
 
