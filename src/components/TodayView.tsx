@@ -51,14 +51,19 @@ export function TodayView() {
   // Reflection State
   const [showReflection, setShowReflection] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    const res = await fetch("/api/missions/today");
-    const data = await res.json();
-    setMission(data.mission);
-    setGoal(data.goal);
-    setPhase(data.phase);
-    setLoading(false);
+  const load = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
+    try {
+      const res = await fetch("/api/missions/today");
+      const data = await res.json();
+      setMission(data.mission);
+      setGoal(data.goal);
+      setPhase(data.phase);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -146,7 +151,7 @@ export function TodayView() {
         setNewTaskObjective("");
         setNewTaskOutcome("");
         setNewTaskDuration("60");
-        await load(); // Reload to get updated mission
+        await load(false); // Reload to get updated mission without blanking screen
       }
     } catch (err) {
       console.error(err);
@@ -166,7 +171,7 @@ export function TodayView() {
   const totalCompleted = completedPrimary + completedSecondary;
   const totalTasks = totalPrimary + totalSecondary;
 
-  if (loading) {
+  if (loading && !mission) {
     return <p className="text-slate">Loading today’s mission…</p>;
   }
 

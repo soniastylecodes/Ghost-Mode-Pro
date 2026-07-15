@@ -29,7 +29,7 @@ const NAV = [
   { href: "/jobs", label: "Job Board", icon: Briefcase },
   { href: "/leads", label: "Leads", icon: Users },
   { href: "/revenue", label: "Revenue Tracker", icon: DollarSign },
-  { href: "/weekly-review", label: "Weekly Review", icon: CheckSquare },
+  { href: "/reviews", label: "Reviews", icon: CheckSquare },
   { href: "/role-models", label: "Role Models", icon: Trophy },
   { href: "/rest", label: "Rest Schedule", icon: Coffee },
 ];

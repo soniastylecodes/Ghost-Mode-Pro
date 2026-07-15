@@ -14,7 +14,9 @@ export function ProofModal({
   onResolved: () => void;
 }) {
   const isUrl = task.proofTypeRequired === "url";
+  const isScreenshot = task.proofTypeRequired === "screenshot";
   const [content, setContent] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{
     verdict: VerdictValue;
@@ -26,13 +28,30 @@ export function ProofModal({
     setError(null);
     setSubmitting(true);
     try {
+      let finalContent = content;
+
+      if (isScreenshot) {
+        if (!file) throw new Error("Please select an image file to upload.");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error || "File upload failed");
+        
+        finalContent = uploadData.url;
+      }
+
       const res = await fetch("/api/proof", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           taskId: task.id,
           type: task.proofTypeRequired,
-          content,
+          content: finalContent,
         }),
       });
       const data = await res.json();
@@ -73,12 +92,20 @@ export function ProofModal({
         {!result ? (
           <div className="mt-5">
             <label className="gm-label" htmlFor="proof">
-              {isUrl ? "Paste the URL to your work" : "Describe / paste your proof"}
+              {isScreenshot ? "Upload your screenshot proof" : isUrl ? "Paste the URL to your work" : "Describe / paste your proof"}
             </label>
-            {isUrl ? (
+            {isScreenshot ? (
+              <input
+                type="file"
+                id="proof"
+                accept="image/*"
+                className="gm-input p-2 w-full file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-signal file:text-black hover:file:bg-signal/80 cursor-pointer"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
+            ) : isUrl ? (
               <input
                 id="proof"
-                className="gm-input"
+                className="gm-input w-full"
                 placeholder="https://…"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -87,7 +114,7 @@ export function ProofModal({
               <textarea
                 id="proof"
                 rows={6}
-                className="gm-input resize-none"
+                className="gm-input resize-none w-full"
                 placeholder="Show the evidence. Ghost Mode judges outcomes, not effort."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -102,7 +129,7 @@ export function ProofModal({
               </button>
               <button
                 onClick={submit}
-                disabled={submitting || content.trim().length === 0}
+                disabled={submitting || (isScreenshot ? !file : content.trim().length === 0)}
                 className="gm-btn-primary"
               >
                 {submitting ? "Ghost Mode is judging…" : "Submit for verdict"}
@@ -123,6 +150,7 @@ export function ProofModal({
                   onClick={() => {
                     setResult(null);
                     setContent("");
+                    setFile(null);
                   }}
                   className="gm-btn-ghost"
                 >

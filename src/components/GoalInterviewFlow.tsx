@@ -24,7 +24,7 @@ const EMPTY: FormState = {
   targetNumber: "",
   deadline: "",
   definitionOfSuccess: "",
-  milestones: [],
+  milestones: [{ title: "", deadline: "", completed: false }],
   
   income: "",
   skills: "",
@@ -189,7 +189,7 @@ export function GoalInterviewFlow() {
                     value={m.title}
                     onChange={(e) => {
                       const newM = [...form.milestones];
-                      newM[i].title = e.target.value;
+                      newM[i] = { ...newM[i], title: e.target.value };
                       setForm(f => ({ ...f, milestones: newM }));
                     }}
                   />
@@ -199,7 +199,7 @@ export function GoalInterviewFlow() {
                     value={m.deadline}
                     onChange={(e) => {
                       const newM = [...form.milestones];
-                      newM[i].deadline = e.target.value;
+                      newM[i] = { ...newM[i], deadline: e.target.value };
                       setForm(f => ({ ...f, milestones: newM }));
                     }}
                   />

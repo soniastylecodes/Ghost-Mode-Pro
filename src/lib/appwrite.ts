@@ -1,4 +1,4 @@
-import { Client, Account, Databases } from "node-appwrite";
+import { Client, Account, Databases, Storage } from "node-appwrite";
 import { cookies } from "next/headers";
 
 export function createSessionClient(customCookies?: any) {
@@ -24,6 +24,9 @@ export function createSessionClient(customCookies?: any) {
     get databases() {
       return new Databases(client);
     },
+    get storage() {
+      return new Storage(client);
+    },
   };
 }
 
@@ -43,6 +46,9 @@ export function createAdminClient() {
     },
     get databases() {
       return new Databases(client);
+    },
+    get storage() {
+      return new Storage(client);
     },
   };
 }
