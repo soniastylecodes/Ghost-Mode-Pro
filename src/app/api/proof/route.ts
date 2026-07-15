@@ -82,12 +82,27 @@ export async function POST(req: Request) {
           where: { goalId: task.mission.goalId },
         });
         if (roadmap) {
-          const phases = roadmap.phases as unknown as unknown[];
-          const next = Math.min(roadmap.currentPhase + 1, phases.length - 1);
-          await prisma.roadmap.update({
-            where: { goalId: task.mission.goalId },
-            data: { currentPhase: next },
-          });
+          let phasesArray: any[] = [];
+          if (Array.isArray(roadmap.phases)) {
+            phasesArray = roadmap.phases;
+          } else if (typeof roadmap.phases === "string") {
+            try {
+              const parsed = JSON.parse(roadmap.phases);
+              if (Array.isArray(parsed)) {
+                phasesArray = parsed;
+              }
+            } catch (e) {
+              console.error("Failed to parse roadmap phases JSON string:", e);
+            }
+          }
+
+          if (phasesArray.length > 0) {
+            const next = Math.min(roadmap.currentPhase + 1, phasesArray.length - 1);
+            await prisma.roadmap.update({
+              where: { goalId: task.mission.goalId },
+              data: { currentPhase: next },
+            });
+          }
         }
       }
     }

@@ -60,7 +60,20 @@ export async function GET() {
     }
 
     const phaseIndex = mission?.phaseIndex ?? 0;
-    const phase = goal.roadmap?.phases ? (goal.roadmap.phases as unknown as RoadmapPhase[])[phaseIndex] : null;
+    let phasesArray: RoadmapPhase[] = [];
+    if (goal.roadmap?.phases) {
+      if (Array.isArray(goal.roadmap.phases)) {
+        phasesArray = goal.roadmap.phases as unknown as RoadmapPhase[];
+      } else if (typeof goal.roadmap.phases === "string") {
+        try {
+          const parsed = JSON.parse(goal.roadmap.phases);
+          if (Array.isArray(parsed)) {
+            phasesArray = parsed;
+          }
+        } catch (e) {}
+      }
+    }
+    const phase = phasesArray.length > 0 ? phasesArray[phaseIndex] : null;
 
     return NextResponse.json({
       mission,

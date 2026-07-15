@@ -39,10 +39,21 @@ export async function GET() {
     const daysRemaining = Math.max(0, Math.ceil(msLeft / 86400000));
 
     // Mission progress = phase progression + completed task ratio blended.
-    const phases =
-      (goal.roadmap?.phases as unknown as unknown[] | undefined)?.length ?? 1;
+    let phasesCount = 1;
+    if (goal.roadmap?.phases) {
+      if (Array.isArray(goal.roadmap.phases)) {
+        phasesCount = goal.roadmap.phases.length;
+      } else if (typeof goal.roadmap.phases === "string") {
+        try {
+          const parsed = JSON.parse(goal.roadmap.phases);
+          if (Array.isArray(parsed)) {
+            phasesCount = parsed.length;
+          }
+        } catch (e) {}
+      }
+    }
     const phaseProgress = goal.roadmap
-      ? (goal.roadmap.currentPhase / Math.max(1, phases)) * 100
+      ? (goal.roadmap.currentPhase / Math.max(1, phasesCount)) * 100
       : 0;
 
     const missions = await prisma.mission.findMany({
