@@ -14,9 +14,32 @@ export async function scheduleEscalation(
     });
 
     const deadlineTime = deadline.getTime();
+    const nowTime = Date.now();
+    const timeRemaining = deadlineTime - nowTime;
+    
+    // Only schedule checkups if there's more than an hour left
+    const durationThird = timeRemaining > 60 * 60 * 1000 ? Math.floor(timeRemaining / 3) : 0;
 
-    // Create 4 steps
+    // Create steps
     const schedules = [
+      ...(durationThird > 0
+        ? [
+            {
+              userId,
+              missionId,
+              step: "checkup_1",
+              scheduledTime: new Date(nowTime + durationThird),
+              status: "pending",
+            },
+            {
+              userId,
+              missionId,
+              step: "checkup_2",
+              scheduledTime: new Date(nowTime + durationThird * 2),
+              status: "pending",
+            },
+          ]
+        : []),
       {
         userId,
         missionId,
@@ -72,6 +95,8 @@ export async function cancelEscalation(missionId: string) {
 }
 
 const STEP_MESSAGES: Record<string, string> = {
+  checkup_1: "Time check. Are you executing or are you distracted? Prove your work.",
+  checkup_2: "The deadline is approaching. Update your mission progress now.",
   deadline: "Your deadline has passed. Submit your proof now.",
   "30min": "You are 30 minutes late. No excuses. Upload your proof.",
   "60min": "60 minutes overdue. You are diluting your momentum. Prove the work.",
@@ -79,6 +104,8 @@ const STEP_MESSAGES: Record<string, string> = {
 };
 
 const STEP_PRIORITIES: Record<string, number> = {
+  checkup_1: 0,
+  checkup_2: 0,
   deadline: 0,
   "30min": 1,
   "60min": 1,
