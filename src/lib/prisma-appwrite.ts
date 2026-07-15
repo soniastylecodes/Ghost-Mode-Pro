@@ -18,6 +18,20 @@ function mapPrismaToAppwrite(doc: any) {
     }
   }
 
+  // Unwrap One-to-One relationships that Appwrite returns as arrays
+  if (Array.isArray(mapped.roadmap)) mapped.roadmap = mapped.roadmap[0] || null;
+  if (Array.isArray(mapped.vow)) mapped.vow = mapped.vow[0] || null;
+  if (Array.isArray(mapped.reflection)) mapped.reflection = mapped.reflection[0] || null;
+  if (Array.isArray(mapped.interviewResponse)) mapped.interviewResponse = mapped.interviewResponse[0] || null;
+
+  // Parse JSON fields
+  if (typeof mapped.phases === "string") {
+    try { mapped.phases = JSON.parse(mapped.phases); } catch(e) {}
+  }
+  if (typeof mapped.outcomeThreads === "string") {
+    try { mapped.outcomeThreads = JSON.parse(mapped.outcomeThreads); } catch(e) {}
+  }
+
   // Map relationship documents back to foreign key IDs as expected by Prisma code
   if (doc.user) {
     mapped.userId = typeof doc.user === "object" ? doc.user.$id : doc.user;
@@ -204,6 +218,16 @@ class CollectionAdapter {
     let count = 0;
     for (const item of args.data) {
       await this.create({ data: item });
+      count++;
+    }
+    return { count };
+  }
+
+  async updateMany(args: { where: any; data: any }) {
+    const documents = await this.findMany({ where: args.where });
+    let count = 0;
+    for (const doc of documents) {
+      await this.update({ where: { id: doc.id }, data: args.data });
       count++;
     }
     return { count };
