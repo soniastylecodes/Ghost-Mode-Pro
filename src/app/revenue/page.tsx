@@ -27,8 +27,6 @@ export default async function RevenuePage() {
   const serializedLogs = revenueLogs.map(log => ({
     ...log,
     date: log.date.toISOString(),
-    createdAt: log.createdAt.toISOString(),
-    updatedAt: log.updatedAt.toISOString(),
   }));
 
   return (
