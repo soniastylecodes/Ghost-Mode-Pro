@@ -100,9 +100,23 @@ export async function GET() {
       momentumScore,
     };
 
+    let parsedThreads = [];
+    if (goal.outcomeThreads) {
+      try {
+        parsedThreads = typeof goal.outcomeThreads === "string" ? JSON.parse(goal.outcomeThreads) : goal.outcomeThreads;
+      } catch (e) {
+        console.error("Failed to parse outcomeThreads", e);
+      }
+    }
+
     return NextResponse.json({
       metrics,
-      goal: { id: goal.id, title: goal.title, deadline: goal.deadline, outcomeThreads: goal.outcomeThreads },
+      goal: { 
+        id: goal.id, 
+        title: goal.title, 
+        deadline: goal.deadline, 
+        outcomeThreads: parsedThreads 
+      },
     });
   } catch (err) {
     if ((err as Error).message === "UNAUTHORIZED")
