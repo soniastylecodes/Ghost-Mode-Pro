@@ -30,11 +30,11 @@ export default async function ReviewsPage() {
 
   const missions = [];
   for (const m of allMissions) {
-    if (m.reflection) {
-      if (typeof m.reflection === "string") {
-        m.reflection = await prisma.reflection.findUnique({ where: { id: m.reflection } });
+    if ((m as any).reflection) {
+      if (typeof (m as any).reflection === "string") {
+        (m as any).reflection = await prisma.reflection.findUnique({ where: { id: (m as any).reflection } });
       }
-      missions.push(m);
+      missions.push(m as any);
     }
   }
 
