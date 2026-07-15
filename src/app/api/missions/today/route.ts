@@ -17,16 +17,17 @@ async function getActiveGoal(userId: string) {
   const goal = await prisma.goal.findFirst({
     where: { userId, status: "active" },
     orderBy: { createdAt: "desc" },
+    include: { roadmap: true, interviewResponse: true }
   });
 
   if (!goal) return null;
 
   // Appwrite relation adapter shim: manually fetch relation objects if returned as IDs
-  if (goal.roadmap && typeof goal.roadmap === "string") {
-    goal.roadmap = await prisma.roadmap.findUnique({ where: { id: goal.roadmap as string } });
+  if ((goal as any).roadmap && typeof (goal as any).roadmap === "string") {
+    (goal as any).roadmap = await prisma.roadmap.findUnique({ where: { id: (goal as any).roadmap as string } });
   }
-  if (goal.interviewResponse && typeof goal.interviewResponse === "string") {
-    goal.interviewResponse = await prisma.interviewResponse.findUnique({ where: { id: goal.interviewResponse as string } });
+  if ((goal as any).interviewResponse && typeof (goal as any).interviewResponse === "string") {
+    (goal as any).interviewResponse = await prisma.interviewResponse.findUnique({ where: { id: (goal as any).interviewResponse as string } });
   }
 
   return goal;
