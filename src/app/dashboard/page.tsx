@@ -24,7 +24,8 @@ export default async function DashboardPage() {
 
   // Days remaining until deadline.
   const now = new Date();
-  const msLeft = goal.deadline.getTime() - now.getTime();
+  const deadlineDate = goal.deadline ? new Date(goal.deadline) : new Date();
+  const msLeft = deadlineDate.getTime() - now.getTime();
   const daysRemaining = Math.max(0, Math.ceil(msLeft / 86400000));
 
   // Mission progress
@@ -98,7 +99,7 @@ export default async function DashboardPage() {
   const goalLite = { 
     id: goal.id, 
     title: goal.title, 
-    deadline: goal.deadline.toISOString(), 
+    deadline: deadlineDate.toISOString(), 
     outcomeThreads: parsedThreads 
   };
 
