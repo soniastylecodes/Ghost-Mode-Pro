@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ID } from "appwrite";
-import { account } from "@/lib/appwrite-client";
+import { account, projectId } from "@/lib/appwrite-client";
 
 type Mode = "signin" | "signup";
 
@@ -83,7 +83,7 @@ export function AuthModal({ isOpen, initialMode = "signup", onClose }: AuthModal
         const fallback = localStorage.getItem("cookieFallback");
         if (fallback) {
           const parsed = JSON.parse(fallback);
-          const cookieName = "a_session_6a55033c0003c8088a1b";
+          const cookieName = `a_session_${projectId.toLowerCase()}`;
           if (parsed[cookieName]) {
             document.cookie = `${cookieName}=${parsed[cookieName]}; path=/; max-age=31536000; SameSite=Lax; Secure`;
           }
