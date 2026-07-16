@@ -69,7 +69,7 @@ export default async function ReviewsPage() {
                   <div key={m.id} className={`gm-card space-y-3 ${borderColor} ${bgColor} border-2`}>
                     <div className="flex justify-between text-steel text-sm">
                       <span className="font-semibold">{format(new Date(m.date), "EEEE, MMM do")}</span>
-                      <span>AI Grade: <span className={titleColor}>{m.reflection?.aiGrade ?? m.reflection?.focusScore}/100</span></span>
+                      <span>Ghost Mode Rating: <span className={titleColor}>{m.reflection?.aiGrade ?? m.reflection?.focusScore}/100</span></span>
                     </div>
                     
                     {m.reflection?.aiFeedback ? (
@@ -79,7 +79,7 @@ export default async function ReviewsPage() {
                       </div>
                     ) : (
                       <div className="mt-2">
-                        <p className="text-steel text-sm italic">No AI feedback generated.</p>
+                        <p className="text-steel text-sm italic">No Ghost Mode feedback generated.</p>
                       </div>
                     )}
 
