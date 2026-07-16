@@ -9,7 +9,9 @@ import type { RoadmapPhase } from "@/lib/types";
 
 function startOfToday(): Date {
   const d = new Date();
-  d.setHours(0, 0, 0, 0);
+  // Shift to Nigeria time (UTC+1), truncate to midnight, then shift back to UTC
+  d.setUTCHours(d.getUTCHours() + 1, 0, 0, 0);
+  d.setUTCHours(d.getUTCHours() - 1);
   return d;
 }
 
