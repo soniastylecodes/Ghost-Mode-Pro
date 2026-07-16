@@ -40,7 +40,7 @@ export default async function ReviewsPage() {
 
   const weeklyReviews = await prisma.weeklyReview.findMany({
     where: { goalId: goal.id },
-    orderBy: { createdAt: "desc" }
+    orderBy: { id: "desc" }
   });
 
   return (

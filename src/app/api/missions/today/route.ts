@@ -122,18 +122,20 @@ export async function POST() {
     // Fetch the most recent mission before today to assess yesterday's progress.
     const lastMission = await prisma.mission.findFirst({
       where: { goalId: goal.id },
-      orderBy: { date: "desc" },
-      include: { primaryTasks: true, reflection: true }
+      orderBy: { date: "desc" }
     });
 
     let priorSummary = "";
     if (lastMission) {
-      const primaryList = lastMission.primaryTasks;
+      // Manually fetch relations since CollectionAdapter ignores 'include'
+      const primaryList = await prisma.primaryTask.findMany({ where: { missionId: lastMission.id } });
+      const reflection = await prisma.reflection.findFirst({ where: { missionId: lastMission.id } });
+
       const completedPrimary = primaryList.filter(t => t.status === "complete");
       const missedPrimary = primaryList.filter(t => t.status !== "complete");
       
-      const aiFeedbackContext = (lastMission as any).reflection?.aiFeedback
-        ? `\nAI Feedback Given Yesterday: "${(lastMission as any).reflection.aiFeedback}"\nAI Grade: ${(lastMission as any).reflection.aiGrade}/100`
+      const aiFeedbackContext = reflection?.aiFeedback
+        ? `\nAI Feedback Given Yesterday: "${reflection.aiFeedback}"\nAI Grade: ${reflection.aiGrade}/100`
         : "";
 
       priorSummary = `Last mission was on ${lastMission.date.toLocaleDateString()}.
