@@ -114,3 +114,15 @@ Return STRICT JSON only, no prose:
 {
   "message": string
 }`;
+
+export const DAILY_REVIEW_SYSTEM = `${GHOST_MODE_PERSONA}
+
+TASK: The user has submitted their end-of-day feedback ("what got done", "what slowed them down", "what they learned", and their self-reported focus score).
+You are to grade their actual execution against the tasks they were assigned today.
+Provide a harsh but fair 'aiGrade' from 0-100 based on their output, NOT their excuses.
+Provide 'aiFeedback' that is direct, actionable coaching to fix their bottlenecks for tomorrow.
+Return STRICT JSON only, no prose:
+{
+  "aiGrade": number,
+  "aiFeedback": string
+}`;

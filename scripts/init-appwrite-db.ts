@@ -147,7 +147,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Job", "status", 50, false, "new");
         await databases.createStringAttribute(databaseId, "Job", "notes", 4096, false);
         await waitForAttributes("Job", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
     // --- User ---
     async () => {
@@ -164,7 +164,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "User", "pushoverApiToken", 255, false);
         await databases.createStringAttribute(databaseId, "User", "baseCurrency", 10, false, "NGN");
         await waitForAttributes("User", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Streak ---
@@ -177,7 +177,7 @@ async function main() {
         await databases.createIntegerAttribute(databaseId, "Streak", "totalFocusMinutes", false, 0, undefined, 0);
         await databases.createStringAttribute(databaseId, "Streak", "calendarDays", 2000, false);
         await waitForAttributes("Streak", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Goal ---
@@ -194,7 +194,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Goal", "definitionOfSuccess", 2000, false);
         await databases.createStringAttribute(databaseId, "Goal", "outcomeThreads", 2000, false);
         await waitForAttributes("Goal", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Vow ---
@@ -204,7 +204,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Vow", "missionStatement", 4096, true);
         await databases.createStringAttribute(databaseId, "Vow", "whyItMatters", 4096, true);
         await waitForAttributes("Vow", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- InterviewResponse ---
@@ -217,7 +217,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "InterviewResponse", "commitments", 2048, true);
         await databases.createStringAttribute(databaseId, "InterviewResponse", "distractions", 2048, true);
         await waitForAttributes("InterviewResponse", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Roadmap ---
@@ -228,7 +228,7 @@ async function main() {
         await databases.createIntegerAttribute(databaseId, "Roadmap", "currentPhase", false, 0, undefined, 0);
         await databases.createStringAttribute(databaseId, "Roadmap", "rawPlan", 2000, false);
         await waitForAttributes("Roadmap", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Mission ---
@@ -241,7 +241,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Mission", "summary", 4096, false);
         await databases.createDatetimeAttribute(databaseId, "Mission", "deadline", true);
         await waitForAttributes("Mission", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- PrimaryTask ---
@@ -258,7 +258,7 @@ async function main() {
         await databases.createBooleanAttribute(databaseId, "PrimaryTask", "extensionRequested", false, false);
         await databases.createIntegerAttribute(databaseId, "PrimaryTask", "extensionGrantedMinutes", false);
         await waitForAttributes("PrimaryTask", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- SecondaryTask ---
@@ -268,7 +268,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "SecondaryTask", "objective", 2048, true);
         await databases.createStringAttribute(databaseId, "SecondaryTask", "status", 50, false, "pending");
         await waitForAttributes("SecondaryTask", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Proof ---
@@ -280,7 +280,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "Proof", "verdict", 50, false);
         await databases.createStringAttribute(databaseId, "Proof", "reason", 1000, false);
         await waitForAttributes("Proof", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- NotificationLog ---
@@ -293,7 +293,7 @@ async function main() {
         await databases.createIntegerAttribute(databaseId, "NotificationLog", "priority", false);
         await databases.createStringAttribute(databaseId, "NotificationLog", "status", 50, true);
         await waitForAttributes("NotificationLog", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- PushSchedule ---
@@ -306,7 +306,7 @@ async function main() {
         await databases.createDatetimeAttribute(databaseId, "PushSchedule", "scheduledTime", true);
         await databases.createStringAttribute(databaseId, "PushSchedule", "status", 50, true);
         await waitForAttributes("PushSchedule", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- AppSettings ---
@@ -322,19 +322,21 @@ async function main() {
         await databases.createStringAttribute(databaseId, "AppSettings", "proofSystemPrompt", 2000, false);
         await databases.createStringAttribute(databaseId, "AppSettings", "decisionSystemPrompt", 2000, false);
         await waitForAttributes("AppSettings", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Reflection ---
     async () => {
-      const keys = ["whatGotDone", "whatSlowedYouDown", "whatYouLearned", "focusScore"];
+      const keys = ["whatGotDone", "whatSlowedYouDown", "whatYouLearned", "focusScore", "aiFeedback", "aiGrade"];
       try {
         await databases.createStringAttribute(databaseId, "Reflection", "whatGotDone", 2000, true);
         await databases.createStringAttribute(databaseId, "Reflection", "whatSlowedYouDown", 2000, true);
         await databases.createStringAttribute(databaseId, "Reflection", "whatYouLearned", 2000, true);
         await databases.createIntegerAttribute(databaseId, "Reflection", "focusScore", true, 1, 10);
+        await databases.createStringAttribute(databaseId, "Reflection", "aiFeedback", 4096, false);
+        await databases.createIntegerAttribute(databaseId, "Reflection", "aiGrade", false, 0, 100);
         await waitForAttributes("Reflection", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- WeeklyReview ---
@@ -352,7 +354,7 @@ async function main() {
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "incomeProgress", true);
         await databases.createFloatAttribute(databaseId, "WeeklyReview", "leadsFollowedUpPct", true);
         await waitForAttributes("WeeklyReview", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- RoleModel ---
@@ -364,7 +366,7 @@ async function main() {
         await databases.createStringAttribute(databaseId, "RoleModel", "notes", 2000, false);
         await databases.createStringAttribute(databaseId, "RoleModel", "imageUrl", 512, false);
         await waitForAttributes("RoleModel", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- Lead ---
@@ -377,7 +379,7 @@ async function main() {
         await databases.createDatetimeAttribute(databaseId, "Lead", "nextFollowUpDate", false);
         await databases.createStringAttribute(databaseId, "Lead", "notes", 2000, false);
         await waitForAttributes("Lead", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
 
     // --- RevenueLog ---
@@ -391,7 +393,7 @@ async function main() {
         await databases.createFloatAttribute(databaseId, "RevenueLog", "originalAmount", false);
         await databases.createDatetimeAttribute(databaseId, "RevenueLog", "date", true);
         await waitForAttributes("RevenueLog", keys);
-      } catch (err: any) { if (err.code !== 409) throw err; }
+      } catch (err: any) { if (err.code !== 409 && err.type !== 'attribute_limit_exceeded') throw err; }
     },
   ];
 

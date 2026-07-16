@@ -69,20 +69,29 @@ export default async function ReviewsPage() {
                   <div key={m.id} className={`gm-card space-y-3 ${borderColor} ${bgColor} border-2`}>
                     <div className="flex justify-between text-steel text-sm">
                       <span className="font-semibold">{format(new Date(m.date), "EEEE, MMM do")}</span>
-                      <span>Focus Score: <span className={titleColor}>{m.reflection?.focusScore}/5</span></span>
+                      <span>AI Grade: <span className={titleColor}>{m.reflection?.aiGrade ?? m.reflection?.focusScore}/100</span></span>
                     </div>
                     
-                    <div>
-                      <h4 className={`${titleColor} text-xs uppercase font-bold tracking-wider`}>What Got Done</h4>
-                      <p className="text-bone text-sm mt-1">{m.reflection?.whatGotDone}</p>
-                    </div>
-                    <div>
-                      <h4 className={`${titleColor} text-xs uppercase font-bold tracking-wider`}>Bottleneck</h4>
-                      <p className="text-bone text-sm mt-1">{m.reflection?.whatSlowedYouDown}</p>
-                    </div>
-                    <div>
-                      <h4 className={`${titleColor} text-xs uppercase font-bold tracking-wider`}>Lesson</h4>
-                      <p className="text-bone text-sm mt-1">{m.reflection?.whatYouLearned}</p>
+                    {m.reflection?.aiFeedback ? (
+                      <div className="mt-2">
+                        <h4 className={`${titleColor} text-xs uppercase font-bold tracking-wider mb-2`}>AI Coach Feedback</h4>
+                        <p className="text-bone text-sm leading-relaxed whitespace-pre-wrap">{m.reflection.aiFeedback}</p>
+                      </div>
+                    ) : (
+                      <div className="mt-2">
+                        <p className="text-steel text-sm italic">No AI feedback generated.</p>
+                      </div>
+                    )}
+
+                    <div className="pt-3 mt-3 border-t border-border/30 grid grid-cols-1 md:grid-cols-2 gap-3 opacity-60 hover:opacity-100 transition-opacity">
+                      <div>
+                        <h4 className="text-steel text-[10px] uppercase font-bold tracking-wider">Your Report</h4>
+                        <p className="text-slate text-xs mt-1 truncate">{m.reflection?.whatGotDone}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-steel text-[10px] uppercase font-bold tracking-wider">Bottleneck</h4>
+                        <p className="text-slate text-xs mt-1 truncate">{m.reflection?.whatSlowedYouDown}</p>
+                      </div>
                     </div>
                   </div>
                 );

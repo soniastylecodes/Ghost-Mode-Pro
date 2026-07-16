@@ -24,7 +24,13 @@ export default async function DashboardPage() {
 
   // Days remaining until deadline.
   const now = new Date();
-  const deadlineDate = goal.deadline ? new Date(goal.deadline) : new Date();
+  let deadlineDate = new Date();
+  if (goal.deadline) {
+    const parsed = new Date(goal.deadline);
+    if (!isNaN(parsed.getTime())) {
+      deadlineDate = parsed;
+    }
+  }
   const msLeft = deadlineDate.getTime() - now.getTime();
   const daysRemaining = Math.max(0, Math.ceil(msLeft / 86400000));
 

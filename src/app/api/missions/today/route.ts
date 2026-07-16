@@ -123,7 +123,7 @@ export async function POST() {
     const lastMission = await prisma.mission.findFirst({
       where: { goalId: goal.id },
       orderBy: { date: "desc" },
-      include: { primaryTasks: true }
+      include: { primaryTasks: true, reflection: true }
     });
 
     let priorSummary = "";
@@ -132,12 +132,16 @@ export async function POST() {
       const completedPrimary = primaryList.filter(t => t.status === "complete");
       const missedPrimary = primaryList.filter(t => t.status !== "complete");
       
+      const aiFeedbackContext = (lastMission as any).reflection?.aiFeedback
+        ? `\nAI Feedback Given Yesterday: "${(lastMission as any).reflection.aiFeedback}"\nAI Grade: ${(lastMission as any).reflection.aiGrade}/100`
+        : "";
+
       priorSummary = `Last mission was on ${lastMission.date.toLocaleDateString()}.
 Status: ${lastMission.status}.
 Primary tasks completed: ${completedPrimary.length}/${primaryList.length}.
 ${completedPrimary.length > 0 ? `Completed objectives: ${completedPrimary.map(t => `"${t.objective}"`).join(", ")}.` : ""}
-${missedPrimary.length > 0 ? `MISSED objectives that need rollover/re-adaptation: ${missedPrimary.map(t => `"${t.objective}"`).join(", ")}.` : ""}
-Please adjust today's missions accordingly (e.g. carry over/re-adapt missed tasks if crucial, or scale intensity down if they struggled).`;
+${missedPrimary.length > 0 ? `MISSED objectives that need rollover/re-adaptation: ${missedPrimary.map(t => `"${t.objective}"`).join(", ")}.` : ""}${aiFeedbackContext}
+Please adjust today's missions accordingly (e.g. carry over/re-adapt missed tasks if crucial, enforce the AI feedback given, or scale intensity down if they struggled).`;
     } else {
       priorSummary = "This is day one. No prior missions.";
     }
@@ -171,22 +175,30 @@ Please adjust today's missions accordingly (e.g. carry over/re-adapt missed task
         summary: result.summary,
         date: startOfToday(),
         deadline: missionDeadline,
-        primaryTasks: {
-          create: result.primaryMissions.map((t) => ({
-            objective: t.objective,
-            priority: t.priority,
-            estDuration: t.estDuration,
-            expectedOutcome: t.expectedOutcome,
-            proofTypeRequired: t.proofTypeRequired,
-          })),
-        },
-        secondaryTasks: {
-          create: result.secondaryTasks.map((t) => ({
-            objective: t.objective,
-          })),
-        },
       },
     });
+
+    for (const t of result.primaryMissions) {
+      await prisma.primaryTask.create({
+        data: {
+          missionId: mission.id,
+          objective: t.objective,
+          priority: t.priority,
+          estDuration: t.estDuration,
+          expectedOutcome: t.expectedOutcome,
+          proofTypeRequired: t.proofTypeRequired,
+        }
+      });
+    }
+
+    for (const t of result.secondaryTasks) {
+      await prisma.secondaryTask.create({
+        data: {
+          missionId: mission.id,
+          objective: t.objective,
+        }
+      });
+    }
 
     const pTasks = await prisma.primaryTask.findMany({
       where: { missionId: mission.id },

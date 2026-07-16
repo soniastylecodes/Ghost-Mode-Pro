@@ -302,6 +302,8 @@ model Reflection {
   whatSlowedYouDown String
   whatYouLearned    String
   focusScore        Int
+  aiFeedback        String?
+  aiGrade           Int?
 
   mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
 }

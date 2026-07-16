@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { generateDailyReview } from "@/lib/ai";
 
 const reflectionSchema = z.object({
   whatGotDone: z.string().min(1),
@@ -37,6 +38,23 @@ export async function POST(req: Request, context: { params: { id: string } }) {
       return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
     }
 
+    // Prepare tasks summary for AI
+    const pTasks = await prisma.primaryTask.findMany({ where: { missionId } });
+    const sTasks = await prisma.secondaryTask.findMany({ where: { missionId } });
+    const tasksSummary = `PRIMARY TASKS:
+${pTasks.map(t => `- [${t.status === 'complete' ? 'x' : ' '}] ${t.objective}`).join('\n')}
+SECONDARY TASKS:
+${sTasks.map(t => `- [${t.status === 'complete' ? 'x' : ' '}] ${t.objective}`).join('\n')}
+`;
+
+    const userReflection = `What got done: ${parsed.data.whatGotDone}
+What slowed me down: ${parsed.data.whatSlowedYouDown}
+What I learned: ${parsed.data.whatYouLearned}
+Self-reported focus score: ${parsed.data.focusScore}/5`;
+
+    // Ask DeepSeek for the daily grade and feedback
+    const aiReview = await generateDailyReview(tasksSummary, userReflection);
+
     const reflection = await prisma.reflection.create({
       data: {
         missionId,
@@ -44,6 +62,8 @@ export async function POST(req: Request, context: { params: { id: string } }) {
         whatSlowedYouDown: parsed.data.whatSlowedYouDown,
         whatYouLearned: parsed.data.whatYouLearned,
         focusScore: parsed.data.focusScore,
+        aiGrade: aiReview.aiGrade,
+        aiFeedback: aiReview.aiFeedback,
       }
     });
 
