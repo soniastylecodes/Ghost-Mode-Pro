@@ -80,6 +80,8 @@ class CollectionAdapter {
       else if (key === "goalId") queryKey = "goal";
       else if (key === "missionId") queryKey = "mission";
       else if (key === "primaryTaskId") queryKey = "primaryTask";
+      else if (key === "createdAt") queryKey = "$createdAt";
+      else if (key === "updatedAt") queryKey = "$updatedAt";
 
       if (val && typeof val === "object" && !(val instanceof Date)) {
         // Range operations
