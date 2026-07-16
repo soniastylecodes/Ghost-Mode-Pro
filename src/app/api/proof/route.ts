@@ -48,14 +48,16 @@ export async function POST(req: Request) {
         type,
         content
       );
-      verdict = aiResult.verdict as "complete" | "needs_revision" | "rejected";
-      reason = aiResult.reason;
-    }
+      
+      // Normalize AI verdict to match exactly one of our three statuses
+      let rawVerdict = (aiResult.verdict || "needs_revision").toLowerCase().trim();
+      if (rawVerdict.includes("complete")) rawVerdict = "complete";
+      else if (rawVerdict.includes("reject")) rawVerdict = "rejected";
+      else rawVerdict = "needs_revision";
 
-    // Persist proof with verdict.
-    const proof = await prisma.proof.create({
-      data: { primaryTaskId: taskId, type, content, verdict, reason },
-    });
+      verdict = rawVerdict as "complete" | "needs_revision" | "rejected";
+      reason = aiResult.reason || "Processed by AI.";
+    }
 
     // Map verdict -> task status.
     const statusMap = {
@@ -64,9 +66,16 @@ export async function POST(req: Request) {
       rejected: "rejected",
     } as const;
 
+    const finalStatus = statusMap[verdict] || "needs_revision";
+
+    // Persist proof with verdict.
+    const proof = await prisma.proof.create({
+      data: { primaryTaskId: taskId, type, content, verdict, reason },
+    });
+
     await prisma.primaryTask.update({
       where: { id: taskId },
-      data: { status: statusMap[verdict] },
+      data: { status: finalStatus },
     });
 
     // On completion, log focus time + streak and possibly advance.
@@ -128,6 +137,9 @@ export async function POST(req: Request) {
     if ((err as Error).message === "UNAUTHORIZED")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     console.error("proof error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.stack || err.message : String(err) },
+      { status: 500 }
+    );
   }
 }
