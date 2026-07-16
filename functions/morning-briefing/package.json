@@ -1,0 +1,7 @@
+{
+  "name": "morning-briefing",
+  "version": "1.0.0",
+  "description": "Appwrite Morning Briefing Cron",
+  "main": "src/index.js",
+  "type": "module"
+}

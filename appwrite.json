@@ -1,0 +1,42 @@
+{
+    "projectId": "6a55033c0003c8088a1b",
+    "projectName": "Ghost Mode",
+    "functions": [
+        {
+            "$id": "morning-briefing",
+            "name": "Morning Briefing",
+            "runtime": "node-21.0",
+            "execute": [],
+            "events": [],
+            "schedule": "0 4 * * *",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/index.js",
+            "commands": "npm install",
+            "path": "functions/morning-briefing",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ]
+        },
+        {
+            "$id": "escalations",
+            "name": "Escalations",
+            "runtime": "node-21.0",
+            "execute": [],
+            "events": [],
+            "schedule": "*/15 * * * *",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/index.js",
+            "commands": "npm install",
+            "path": "functions/escalations",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ]
+        }
+    ]
+}

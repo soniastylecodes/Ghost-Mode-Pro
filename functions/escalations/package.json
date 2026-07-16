@@ -1,0 +1,7 @@
+{
+  "name": "escalations",
+  "version": "1.0.0",
+  "description": "Appwrite Escalations Cron",
+  "main": "src/index.js",
+  "type": "module"
+}

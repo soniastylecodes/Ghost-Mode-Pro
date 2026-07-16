@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPushoverNotification } from "@/lib/pushover";
+import { createMissionForGoal } from "@/lib/missionGenerator";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
     // Find all users with an active goal
     const activeGoals = await prisma.goal.findMany({
       where: { status: "active" },
-      include: { user: true }
+      include: { user: true, roadmap: true, interviewResponse: true }
     });
 
     if (activeGoals.length === 0) {
@@ -32,25 +33,18 @@ export async function GET(req: Request) {
     today.setHours(0, 0, 0, 0);
 
     for (const goal of activeGoals) {
-      // Check if they already generated today's mission
-      const mission = await prisma.mission.findFirst({
-        where: { goalId: goal.id, date: { gte: today } }
-      });
+      try {
+        const { mission } = await createMissionForGoal(goal, goal.userId);
+        
+        const primaryTasks = (mission as any).primaryTasks || [];
 
-      let primaryTasks: any[] = [];
-      if (mission) {
-        primaryTasks = await prisma.primaryTask.findMany({
-          where: { missionId: mission.id }
-        });
-      }
-
-      let message = "";
-      if (mission && primaryTasks.length > 0) {
-        const task1 = primaryTasks[0].objective;
-        message = `Wake up. Your first mission for today is: "${task1}". Get to work immediately.`;
-      } else {
-        message = `Wake up. You have not generated today's mission yet. Open Ghost Mode and get your tasks.`;
-      }
+        let message = "";
+        if (primaryTasks.length > 0) {
+          const task1 = primaryTasks[0].objective;
+          message = `Wake up. Your first mission for today is: "${task1}". Get to work immediately.`;
+        } else {
+          message = `Wake up. Your mission for today is ready. Open Ghost Mode and get your tasks.`;
+        }
 
       // Priority 1 will bypass quiet hours and vibrate loudly on the user's phone.
       await sendPushoverNotification(
@@ -61,6 +55,9 @@ export async function GET(req: Request) {
         "https://ghost-mode-pro.appwrite.network/today"
       );
       sent++;
+      } catch (err: any) {
+        console.error(`Failed to auto-generate morning mission for goal ${goal.id}:`, err);
+      }
     }
 
     return NextResponse.json({ success: true, sent });
