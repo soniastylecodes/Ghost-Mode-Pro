@@ -188,7 +188,7 @@ Please adjust today's missions accordingly (e.g. carry over/re-adapt missed task
         data: {
           missionId: mission.id,
           objective: t.objective,
-          priority: t.priority,
+          priority: Math.min(3, Math.max(1, Number(t.priority) || 3)),
           estDuration: t.estDuration,
           expectedOutcome: t.expectedOutcome,
           proofTypeRequired: t.proofTypeRequired,

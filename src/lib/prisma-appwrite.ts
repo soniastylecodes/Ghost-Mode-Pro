@@ -117,7 +117,7 @@ class CollectionAdapter {
     const entries = Array.isArray(orderBy) ? orderBy : [orderBy];
     for (const entry of entries) {
       for (const [key, val] of Object.entries(entry)) {
-        const queryKey = key === "createdAt" ? "$createdAt" : key === "updatedAt" ? "$updatedAt" : key;
+        const queryKey = key === "createdAt" ? "$createdAt" : key === "updatedAt" ? "$updatedAt" : key === "id" ? "$id" : key;
         if (val === "desc") {
           queries.push(Query.orderDesc(queryKey));
         } else {

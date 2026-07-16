@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         data: {
           missionId,
           objective,
-          priority: existingPrimaryCount + 1,
+          priority: Math.min(3, existingPrimaryCount + 1),
           estDuration: Number(estDuration) || 60,
           expectedOutcome: expectedOutcome || "A verifiable outcome",
           proofTypeRequired: proofTypeRequired || "text",
