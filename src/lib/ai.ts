@@ -513,3 +513,38 @@ Respond strictly in JSON format matching this schema:
     notes: `- Focus purely on what you can control.\n- The work itself is the reward.\n- Cut out all non-essential noise.`,
   };
 }
+
+// ===========================================================================
+// 9. Daily Review (AI Grading)
+// ===========================================================================
+export interface DailyReviewResult {
+  aiGrade: number;
+  aiFeedback: string;
+}
+
+export async function generateDailyReview(
+  tasksSummary: string,
+  userReflection: string
+): Promise<DailyReviewResult> {
+  const user = `TODAY'S TASKS:
+${tasksSummary}
+
+USER'S REFLECTION:
+${userReflection}
+
+Grade them strictly and give actionable feedback.`;
+
+  if (aiEnabled) {
+    try {
+      const raw = await chat(DAILY_REVIEW_SYSTEM, user);
+      return extractJson<DailyReviewResult>(raw);
+    } catch (err) {
+      console.error("generateDailyReview AI error:", err);
+    }
+  }
+
+  return {
+    aiGrade: 50,
+    aiFeedback: "Fallback Mode: You submitted a reflection, but AI is offline. Assume you need to push harder tomorrow."
+  };
+}

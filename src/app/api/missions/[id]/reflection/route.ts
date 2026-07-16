@@ -67,7 +67,6 @@ Self-reported focus score: ${parsed.data.focusScore}/5`;
       }
     });
 
-    const pTasks = await prisma.primaryTask.findMany({ where: { missionId } });
     const completed = pTasks.filter(t => t.status === "complete").length;
     const total = pTasks.length;
     let newStatus = "failed";
