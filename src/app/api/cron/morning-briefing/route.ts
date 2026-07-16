@@ -40,8 +40,8 @@ export async function GET(req: Request) {
 
         let message = "";
         if (primaryTasks.length > 0) {
-          const task1 = primaryTasks[0].objective;
-          message = `Wake up. Your first mission for today is: "${task1}". Get to work immediately.`;
+          const task1 = primaryTasks[0];
+          message = `Wake up. Your first mission for today is: "${task1.objective}". It should take ~${task1.estDuration} minutes. Get to work immediately.`;
         } else {
           message = `Wake up. Your mission for today is ready. Open Ghost Mode and get your tasks.`;
         }
