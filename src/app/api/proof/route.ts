@@ -33,13 +33,24 @@ export async function POST(req: Request) {
     if (!task)
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
 
-    // AI evaluates the proof.
-    const { verdict, reason } = await validateProof(
-      task.objective,
-      task.expectedOutcome,
-      type,
-      content
-    );
+    // Check for manual bypass
+    let verdict: "complete" | "needs_revision" | "rejected" = "complete";
+    let reason = "Manually bypassed by user.";
+
+    if (content.startsWith("BYPASS:")) {
+      verdict = "complete";
+      reason = "Proof validation bypassed manually.";
+    } else {
+      // AI evaluates the proof.
+      const aiResult = await validateProof(
+        task.objective,
+        task.expectedOutcome,
+        type,
+        content
+      );
+      verdict = aiResult.verdict as "complete" | "needs_revision" | "rejected";
+      reason = aiResult.reason;
+    }
 
     // Persist proof with verdict.
     const proof = await prisma.proof.create({

@@ -19,8 +19,15 @@ export function ProofModal({
   useEffect(() => {
     setMounted(true);
   }, []);
-  const isUrl = task.proofTypeRequired === "url";
-  const isScreenshot = task.proofTypeRequired === "screenshot";
+  const [activeProofType, setActiveProofType] = useState<"text" | "url" | "screenshot">(
+    ["text", "url", "screenshot"].includes(task.proofTypeRequired)
+      ? (task.proofTypeRequired as "text" | "url" | "screenshot")
+      : "text"
+  );
+  
+  const isUrl = activeProofType === "url";
+  const isScreenshot = activeProofType === "screenshot";
+  
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -56,7 +63,7 @@ export function ProofModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           taskId: task.id,
-          type: task.proofTypeRequired,
+          type: activeProofType,
           content: finalContent,
         }),
       });
@@ -99,6 +106,27 @@ export function ProofModal({
 
         {!result ? (
           <div className="mt-5">
+            <div className="mb-4 flex gap-2">
+              {(["text", "url", "screenshot"] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => {
+                    setActiveProofType(type);
+                    setContent("");
+                    setFile(null);
+                    setError(null);
+                  }}
+                  className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
+                    activeProofType === type
+                      ? "bg-signal text-black border-signal"
+                      : "bg-void text-steel border-steel/30 hover:border-steel hover:text-bone"
+                  }`}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
+            
             <label className="gm-label" htmlFor="proof">
               {isScreenshot ? "Upload your screenshot proof" : isUrl ? "Paste the URL to your work" : "Describe / paste your proof"}
             </label>
@@ -134,6 +162,35 @@ export function ProofModal({
             <div className="mt-5 flex justify-end gap-3">
               <button onClick={onClose} className="gm-btn-ghost">
                 Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setError(null);
+                  setSubmitting(true);
+                  try {
+                    const res = await fetch("/api/proof", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        taskId: task.id,
+                        type: "text",
+                        content: "BYPASS: User was tired and manually bypassed.",
+                      }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "Validation failed");
+                    setResult({ verdict: data.verdict, reason: data.reason });
+                  } catch (err) {
+                    setError((err as Error).message);
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+                disabled={submitting}
+                className="rounded-lg border border-steel/30 bg-void px-4 py-2 text-sm font-semibold text-slate hover:bg-steel/10 transition-colors"
+                title="Use this if uploads are failing or AI is wrongly rejecting links."
+              >
+                Bypass & Complete
               </button>
               <button
                 onClick={submit}
