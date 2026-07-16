@@ -94,6 +94,27 @@ export async function cancelEscalation(missionId: string) {
   }
 }
 
+export async function scheduleTaskReminder(
+  userId: string,
+  missionId: string,
+  taskId: string,
+  scheduledTime: Date
+) {
+  try {
+    await prisma.pushSchedule.create({
+      data: {
+        userId,
+        missionId,
+        step: `task_reminder_${taskId}`,
+        scheduledTime,
+        status: "pending",
+      },
+    });
+  } catch (err) {
+    console.error("Failed to schedule task reminder:", err);
+  }
+}
+
 const STEP_MESSAGES: Record<string, string> = {
   checkup_1: "Time check. Are you executing or are you distracted? Prove your work.",
   checkup_2: "The deadline is approaching. Update your mission progress now.",
@@ -141,6 +162,35 @@ export async function processEscalations() {
         await prisma.pushSchedule.update({
           where: { id },
           data: { status: "cancelled" },
+        });
+        continue;
+      }
+
+      if (step.startsWith("task_reminder_")) {
+        const taskId = step.replace("task_reminder_", "");
+        const task = await prisma.primaryTask.findUnique({
+          where: { id: taskId },
+        });
+
+        if (!task || task.status === "complete") {
+          await prisma.pushSchedule.update({
+            where: { id },
+            data: { status: "cancelled" },
+          });
+          continue;
+        }
+
+        await sendPushoverNotification(
+          userId,
+          `Time is up for your task: "${task.objective}". Please update your progress or submit proof.`,
+          "Ghost Mode Task Reminder",
+          1,
+          "https://ghost-mode-pro.appwrite.network/today"
+        );
+
+        await prisma.pushSchedule.update({
+          where: { id },
+          data: { status: "sent" },
         });
         continue;
       }

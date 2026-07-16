@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { scheduleTaskReminder } from "@/lib/escalation";
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +49,10 @@ export async function POST(req: Request) {
           proofTypeRequired: proofTypeRequired || "text",
         },
       });
+
+      const scheduledTime = new Date(Date.now() + primaryTask.estDuration * 60 * 1000);
+      await scheduleTaskReminder(userId, missionId, primaryTask.id, scheduledTime);
+
       return NextResponse.json({ success: true, task: primaryTask });
     } else {
       const secondaryTask = await prisma.secondaryTask.create({

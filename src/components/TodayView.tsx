@@ -382,7 +382,7 @@ export function TodayView({
                       </div>
                     )}
 
-                    {taskType === "primary" && (
+                    {taskType.startsWith("primary") && (
                       <div className="sm:col-span-2">
                         <label className="text-xs text-steel mb-1.5 block">Expected Outcome (For Proof)</label>
                         <input 

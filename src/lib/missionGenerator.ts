@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { generateMissions } from "@/lib/ai";
-import { scheduleEscalation } from "@/lib/escalation";
+import { scheduleEscalation, scheduleTaskReminder } from "@/lib/escalation";
 import type { RoadmapPhase } from "@/lib/types";
 
 function startOfToday(): Date {
@@ -96,8 +96,9 @@ Please adjust today's missions accordingly (e.g. carry over/re-adapt missed task
     },
   });
 
+  let accumulatedMinutes = 0;
   for (const t of result.primaryMissions) {
-    await prisma.primaryTask.create({
+    const pt = await prisma.primaryTask.create({
       data: {
         missionId: mission.id,
         objective: t.objective,
@@ -107,6 +108,10 @@ Please adjust today's missions accordingly (e.g. carry over/re-adapt missed task
         proofTypeRequired: t.proofTypeRequired,
       }
     });
+
+    accumulatedMinutes += pt.estDuration;
+    const scheduledTime = new Date(Date.now() + accumulatedMinutes * 60 * 1000);
+    await scheduleTaskReminder(userId, mission.id, pt.id, scheduledTime);
   }
 
   for (const t of result.secondaryTasks) {
