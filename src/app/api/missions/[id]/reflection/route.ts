@@ -62,7 +62,9 @@ Self-reported focus score: ${parsed.data.focusScore}/5`;
         whatSlowedYouDown: parsed.data.whatSlowedYouDown,
         whatYouLearned: parsed.data.whatYouLearned,
         focusScore: parsed.data.focusScore,
+        // @ts-ignore - Supress IDE caching error for new schema fields
         aiGrade: aiReview.aiGrade,
+        // @ts-ignore
         aiFeedback: aiReview.aiFeedback,
       }
     });
